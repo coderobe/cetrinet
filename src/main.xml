@@ -2968,7 +2968,7 @@
           </w>
           <w class="modal-body">
             <w type="p">
-              Version 0.0.1
+              Version 0.1.0
             </w>
             <w type="button" class="btn btn-danger btn-block" data-dismiss="modal">
               Go Back
