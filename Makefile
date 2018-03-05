@@ -1,11 +1,11 @@
-CC:=gcc
-LD:=gcc
+CC:=g++
+LD:=g++
 
-CFLAGS+=-O3
+CFLAGS+=-O3 -std=c++17
 LDFLAGS+=
 
 INCLUDE = -Iinclude
-LIBS = -Llib -lLCUI -lLCUIEx
+LIBS = -lpthread -Llib -lLCUI -lLCUIEx
 
 SOURCES=src/cetrinet.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -19,7 +19,7 @@ TARGET:=${OUTDIR}/cetrinet
 
 ${TARGET}: ${OBJECTS}
 	mkdir -p $(dir ${TARGET})
-	${LD} ${LDFLAGS} -o $@ $+ ${LIBS}
+	${LD} ${LDFLAGS} ${CFLAGS} -o $@ $+ ${LIBS}
 
 run: ${TARGET}
 	(cd bin && ./$(notdir ${TARGET}))
