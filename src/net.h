@@ -8,6 +8,8 @@
 #include "globals.h"
 #include "ui.h"
 
-void net_worker(wchar_t* server, wchar_t* username);
+#include "proto/motd.h"
+
+void net_worker(wchar_t* server, wchar_t* port, wchar_t* username);
 
 #endif

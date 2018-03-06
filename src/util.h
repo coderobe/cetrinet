@@ -11,7 +11,7 @@
 namespace util{
   void stdout_silence();
   void stdout_unsilence();
-  void thread_start_net(wchar_t* server, wchar_t* username);
+  void thread_start_net(wchar_t* server, wchar_t* port, wchar_t* username);
   void thread_start_ui();
 };
 

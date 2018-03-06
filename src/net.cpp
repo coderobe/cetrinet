@@ -3,15 +3,20 @@
 using namespace std;
 using json = nlohmann::json;
 
-void net_worker(wchar_t* server, wchar_t* username){
+void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
   if(net_client == nullptr){
-    wcout << L"connecting to '" << server << L"' as '" << username << "'" << endl;
+    wcout << L"connecting to '" << server << L"' (port " << port << " ) as '" << username << "'" << endl;
 
     char serverpath[256];
+    char serverport[256];
     wcstombs(serverpath, server, 256);
+    wcstombs(serverport, port, 256);
+    if(string(serverport).size() < 1){
+      sprintf(serverport, "28420");
+    }
 
     char buffer[256];
-    //snprintf(buffer, 256, "%s/", serverpath);
+    //snprintf(buffer, 256, "%s:%s/", serverpath, serverport);
     snprintf(buffer, 256, "localhost:8080/"); // TODO: remove me
     cout << buffer << endl;
 
@@ -21,8 +26,11 @@ void net_worker(wchar_t* server, wchar_t* username){
       json payload = json::from_msgpack(msg.data());
       cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
       if(payload["t"] == "motd"){
-        cout << "motd: " << payload["d"]["m"] << endl;
-        ui_chat_message_add_raw("MOTD: "+payload["d"].value("m", "<error>"), "light");
+        proto::motd event = proto::motd();
+        event.load_json(payload);
+
+        cout << "motd: " << event.message << endl;
+        ui_chat_message_add_raw("MOTD: "+event.message, "light");
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
@@ -57,6 +65,6 @@ void net_worker(wchar_t* server, wchar_t* username){
     while(net_client != nullptr){
       this_thread::sleep_for(chrono::milliseconds(10));
     }
-    net_worker(server, username);
+    net_worker(server, port, username);
   }
 }

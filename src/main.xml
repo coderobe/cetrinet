@@ -138,8 +138,11 @@ R"===(<?xml version="1.0" encoding="UTF-8" ?>
       </w>
       <!-- Chat -->
       <w class="chatarea">
-        <w id="chatarea-output" class="chatarea-output"/>
-        <w class="chatarea-input" type="textedit" placeholder="Enter message..."/>
+        <w class="view-box chatarea-output">
+          <w id="chatarea-output"/>
+          <w id="chatarea-scrollbar" type="scrollbar" target="chatarea-output"/>
+        </w>
+        <w id="chatarea-input" class="chatarea-input" type="textedit" placeholder="Enter message..."/>
       </w>
       <!-- About modal -->
       <w id="modal-win-about" type="modal" class="modal">
@@ -182,6 +185,12 @@ R"===(<?xml version="1.0" encoding="UTF-8" ?>
                   Server Address
                 </w>
                 <w type="textedit" class="form-control" id="input-data-server" placeholder="rrerr.net"/>
+              </w>
+              <w class="form-group">
+                <w type="label" for="input-data-port">
+                  Server Port
+                </w>
+                <w type="textedit" class="form-control" id="input-data-port" placeholder="28420"/>
               </w>
               <w class="form-group">
                 <w type="label" for="input-data-username">

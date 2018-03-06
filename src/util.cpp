@@ -19,13 +19,14 @@ namespace util {
     }
   }
 
-  void thread_start_net(wchar_t* server, wchar_t* username){
+  void thread_start_net(wchar_t* server, wchar_t* port, wchar_t* username){
     cout << "Starting net worker" << endl;
-    threads.push_back(new thread(net_worker, server, username));
+    threads.push_back(new thread(net_worker, server, port, username));
   }
 
   void thread_start_ui(){
     cout << "Starting UI worker" << endl;
     threads.push_back(new thread(ui_worker));
+    threads.push_back(new thread(ui_chat_scroller_worker));
   }
 }

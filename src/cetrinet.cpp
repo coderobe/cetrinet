@@ -14,6 +14,7 @@ using namespace std;
 WsClient* net_client = nullptr;
 std::vector<std::thread*> threads;
 wchar_t server[256];
+wchar_t port[256];
 wchar_t username[256];
 
 int main(){
