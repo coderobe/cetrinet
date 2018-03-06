@@ -36,6 +36,7 @@ pack: ${TARGET}
 	upx --best ${TARGET}
 
 build: ${TARGET}
+release: clean build pack
 
 debug: CFLAGS+=-ggdb -D_DEBUG
 debug: build
