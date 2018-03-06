@@ -1,6 +1,8 @@
 # cetrinet (name subject to change) by coderobe
 
 ## Dependencies
+- GNU make
+- clang
 - LCUI https://github.com/lc-soft/LCUI
 - lcui.css https://github.com/lc-ui/lcui.css
 - nlohmann/json https://github.com/nlohmann/json
