@@ -8,19 +8,17 @@ INCLUDE = -Iinclude
 LIBS = -Llib -lssl -lcrypto -lxml2 -lfreetype -lpng -ljpeg -lX11
 LIBS += -Wl,-Bstatic -lboost_system -lLCUI -lLCUIEx -Wl,-Bdynamic
 
-SOURCES=src/cetrinet.cpp src/util.cpp src/net.cpp src/ui.cpp
+SOURCES=$(wildcard src/*.cpp) $(wildcard src/proto/*.cpp)
 OBJECTS=$(SOURCES:.cpp=.o)
 OUTDIR:=bin
 TARGET:=${OUTDIR}/cetrinet
 
-.DEFAULT_GOAL=all
-
 %.o: %.cpp
 	${CC} ${CFLAGS} ${INCLUDE} -c $< -o $@
 
-${TARGET}: ${OBJECTS}
+${TARGET}: ${OBJECTS} assets/main.xml
 	mkdir -p $(dir ${TARGET})
-	${LD} ${LDFLAGS} ${CFLAGS} -o $@ $+ ${LIBS}
+	${LD} ${LDFLAGS} ${CFLAGS} -o $@ $(filter-out assets/main.xml,$+) ${LIBS}
 
 run: ${TARGET}
 	(cd bin && ./$(notdir ${TARGET}))
@@ -29,6 +27,7 @@ run: ${TARGET}
 
 all: clean build run
 
+assets/main.xml: assets
 assets: src/*.css src/*.xml
 	mkdir -p assets
 	cp src/*.css assets
@@ -39,7 +38,7 @@ pack: build ${TARGET}
 	upx --best ${TARGET}
 
 build: assets ${TARGET}
-release: clean build pack
+release: build pack
 
 debug: CFLAGS+=-ggdb -D_DEBUG -Og
 debug: build
