@@ -1,11 +1,11 @@
 CC:=g++
 LD:=g++
 
-CFLAGS+=-O3 -std=c++17
+CFLAGS+=-pthread -Og -std=c++17
 LDFLAGS+=
 
 INCLUDE = -Iinclude
-LIBS = -lpthread -Llib -lLCUI -lLCUIEx
+LIBS = -Llib -lLCUI -lLCUIEx -lssl -lcrypto -lboost_system
 
 SOURCES=src/cetrinet.cpp
 OBJECTS=$(SOURCES:.cpp=.o)

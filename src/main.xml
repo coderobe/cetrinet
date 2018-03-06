@@ -3007,7 +3007,7 @@
                 <w type="textedit" class="form-control" id="input-data-username"/>
               </w>
               <w class="form-group">
-                <w type="button" class="btn btn-success">
+                <w id="input-connect" type="button" class="btn btn-success" data-dismiss="modal">
                   Connect
                 </w>
               </w>
