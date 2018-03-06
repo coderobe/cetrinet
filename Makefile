@@ -1,14 +1,14 @@
-CC:=g++
-LD:=g++
+CC:=clang++
+LD:=clang++
 
-CFLAGS+=-pthread -O3 -std=c++17
+CFLAGS+=-pthread -Os -std=c++17
 LDFLAGS+=
 
 INCLUDE = -Iinclude
 LIBS = -Llib -lssl -lcrypto -lxml2 -lfreetype -lpng -ljpeg -lX11
 LIBS += -Wl,-Bstatic -lboost_system -lLCUI -lLCUIEx -Wl,-Bdynamic
 
-SOURCES=src/cetrinet.cpp
+SOURCES=src/cetrinet.cpp src/util.cpp src/net.cpp src/ui.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 OUTDIR:=bin
 TARGET:=${OUTDIR}/cetrinet
@@ -16,7 +16,7 @@ TARGET:=${OUTDIR}/cetrinet
 .DEFAULT_GOAL=all
 
 %.o: %.cpp
-	${CC} ${CFLAGS} ${INCLUDE} -c $< -o $@ ${LIBS}
+	${CC} ${CFLAGS} ${INCLUDE} -c $< -o $@
 
 ${TARGET}: ${OBJECTS}
 	mkdir -p $(dir ${TARGET})
@@ -31,7 +31,6 @@ all: clean build run
 
 assets: src/*.css src/*.xml
 	mkdir -p assets
-	#cp src/*.ttf assets
 	cp src/*.css assets
 	cp src/*.xml assets
 	minify src/main.xml > assets/main.xml
@@ -42,7 +41,7 @@ pack: build ${TARGET}
 build: assets ${TARGET}
 release: clean build pack
 
-debug: CFLAGS+=-ggdb -D_DEBUG
+debug: CFLAGS+=-ggdb -D_DEBUG -Og
 debug: build
 
 clean:
