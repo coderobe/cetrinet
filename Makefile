@@ -47,3 +47,4 @@ debug: build
 
 clean:
 	rm -f ${TARGET} ${OBJECTS}
+	rm -rf assets
