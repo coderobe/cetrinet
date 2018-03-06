@@ -1,7 +1,7 @@
 CC:=g++
 LD:=g++
 
-CFLAGS+=-pthread -Og -std=c++17
+CFLAGS+=-pthread -O3 -std=c++17
 LDFLAGS+=
 
 INCLUDE = -Iinclude
@@ -31,6 +31,9 @@ all: clean build run
 
 assets:
 	cp src/*.ttf ${OUTDIR}
+
+pack: ${TARGET}
+	upx --best ${TARGET}
 
 build: ${TARGET}
 
