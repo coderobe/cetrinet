@@ -29,13 +29,17 @@ run: ${TARGET}
 
 all: clean build run
 
-assets:
-	cp src/*.ttf ${OUTDIR}
+assets: src/*.css src/*.xml
+	mkdir -p assets
+	#cp src/*.ttf assets
+	cp src/*.css assets
+	cp src/*.xml assets
+	minify src/main.xml > assets/main.xml
 
-pack: ${TARGET}
+pack: build ${TARGET}
 	upx --best ${TARGET}
 
-build: ${TARGET}
+build: assets ${TARGET}
 release: clean build pack
 
 debug: CFLAGS+=-ggdb -D_DEBUG

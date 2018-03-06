@@ -180,7 +180,7 @@ void ui_worker(){
   stdout_unsilence();
 
   const char* raw_xml_main =
-    #include "main.xml"
+    #include "../assets/main.xml"
   ;
 
   root = LCUIWidget_GetRoot();
