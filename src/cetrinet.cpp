@@ -28,54 +28,34 @@ using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 using json = nlohmann::json;
 
 vector<thread*> threads;
-fpos_t stdout_pos;
-size_t stdout_fd;
-streambuf* stdout_buf;
 atomic<bool> stdout_silenced = false;
+atomic<bool> ui_active = false;
 
 void stdout_silence(){
   if(!stdout_silenced){
     stdout_silenced = true;
-    /*
-    fflush(stdout);
-    fgetpos(stdout, &stdout_pos);
-    stdout_fd = dup(fileno(stdout));
-    dup2(0, fileno(stdout));
-    */
-    /*
-    stdout_buf = cout.rdbuf();
-    ofstream fout("/dev/null");
-    cout.rdbuf(fout.rdbuf());
-    */
     freopen("/dev/null", "w", stdout);
   }
 }
 void stdout_unsilence(){
   if(stdout_silenced){
     stdout_silenced = false;
-    /*
-    fflush(stdout);
-    dup2(stdout_fd, fileno(stdout));
-    close(stdout_fd);
-    fsetpos(stdout, &stdout_pos);
-    */
-    /*
-    cout.rdbuf(stdout_buf);
-    */
     freopen("/dev/tty", "w", stdout);
   }
 }
 
 void ui_chat_message_add_raw(string message, string type="light"){
-  LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
-  LCUI_Widget message_widget = LCUIWidget_New("alert");
-  Widget_AddClass(message_widget, "alert");
-  char buffer[100];
-  snprintf(buffer, 100, "alert-%s", type.c_str());
-  Widget_AddClass(message_widget, buffer);
-  wstring message_wide = wstring(message.begin(), message.end());
-  TextView_SetTextW(message_widget, message_wide.c_str());
-  Widget_Append(chat, message_widget);
+  if(ui_active){
+    LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
+    LCUI_Widget message_widget = LCUIWidget_New("alert");
+    Widget_AddClass(message_widget, "alert");
+    char buffer[100];
+    snprintf(buffer, 100, "alert-%s", type.c_str());
+    Widget_AddClass(message_widget, buffer);
+    wstring message_wide = wstring(message.begin(), message.end());
+    TextView_SetTextW(message_widget, message_wide.c_str());
+    Widget_Append(chat, message_widget);
+  }
 }
 
 wchar_t server[256];
@@ -158,42 +138,45 @@ void ui_add_tile(LCUI_Widget parent){
 }
 
 void ui_populate_fields(){
-  // playfields
-  for(size_t playernum = 1; playernum < 10; playernum++){
-    char buffer[100];
-    snprintf(buffer, 100, "playfield-%d", playernum);
-    LCUI_Widget field = LCUIWidget_GetById(buffer);
-    for(size_t row_n = 0; row_n < 20; row_n++){
-      LCUI_Widget row = LCUIWidget_New(NULL);
-      Widget_AddClass(row, "row");
-      for(size_t col_n = 0; col_n < 12; col_n++){
-        ui_add_tile(row);
+  if(ui_active){
+    // playfields
+    for(size_t playernum = 1; playernum < 10; playernum++){
+      char buffer[100];
+      snprintf(buffer, 100, "playfield-%d", playernum);
+      LCUI_Widget field = LCUIWidget_GetById(buffer);
+      for(size_t row_n = 0; row_n < 20; row_n++){
+        LCUI_Widget row = LCUIWidget_New(NULL);
+        Widget_AddClass(row, "row");
+        for(size_t col_n = 0; col_n < 12; col_n++){
+          ui_add_tile(row);
+        }
+        Widget_Append(field, row);
       }
-      Widget_Append(field, row);
     }
-  }
-  // previews
-  for(size_t previewnum = 1; previewnum < 7; previewnum++){
-    char buffer[100];
-    snprintf(buffer, 100, "previewfield-%d", previewnum);
-    LCUI_Widget field = LCUIWidget_GetById(buffer);
-    for(size_t row_n = 0; row_n < 6; row_n++){
-      LCUI_Widget row = LCUIWidget_New(NULL);
-      Widget_AddClass(row, "row");
-      for(size_t col_n = 0; col_n < 6; col_n++){
-        ui_add_tile(row);
+    // previews
+    for(size_t previewnum = 1; previewnum < 7; previewnum++){
+      char buffer[100];
+      snprintf(buffer, 100, "previewfield-%d", previewnum);
+      LCUI_Widget field = LCUIWidget_GetById(buffer);
+      for(size_t row_n = 0; row_n < 6; row_n++){
+        LCUI_Widget row = LCUIWidget_New(NULL);
+        Widget_AddClass(row, "row");
+        for(size_t col_n = 0; col_n < 6; col_n++){
+          ui_add_tile(row);
+        }
+        Widget_Append(field, row);
       }
-      Widget_Append(field, row);
     }
   }
 }
 
-int ui_worker(){
+void ui_worker(){
   LCUI_Widget root, pack;
 
   stdout_silence();
   LCUI_Init();
   LCUIEx_Init();
+  ui_active = true;
   stdout_unsilence();
 
   const char* raw_xml_main =
@@ -204,7 +187,7 @@ int ui_worker(){
   pack = LCUIBuilder_LoadString(raw_xml_main, string(raw_xml_main).size());
 
   if(!pack)
-    return -1;
+    terminate();
 
   LCUIDisplay_SetSize(859, 690);
   Widget_SetTitleW(root, L"cetrinet");
@@ -227,7 +210,8 @@ int ui_worker(){
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
 
-  return LCUI_Main();  
+  LCUI_Main();
+  ui_active = false;
 }
 
 int main(){
