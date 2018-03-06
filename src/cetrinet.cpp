@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <thread>
 #include <chrono>
@@ -11,6 +12,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/widget/textedit.h>
@@ -19,6 +21,8 @@ extern "C" {
   #include <LCUIEx.h>
 }
 
+#define inline_raw(...) ""#__VA_ARGS__""
+
 using namespace std;
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 using json = nlohmann::json;
@@ -26,28 +30,43 @@ using json = nlohmann::json;
 vector<thread*> threads;
 fpos_t stdout_pos;
 size_t stdout_fd;
+streambuf* stdout_buf;
 atomic<bool> stdout_silenced = false;
 
 void stdout_silence(){
   if(!stdout_silenced){
     stdout_silenced = true;
+    /*
     fflush(stdout);
     fgetpos(stdout, &stdout_pos);
     stdout_fd = dup(fileno(stdout));
     dup2(0, fileno(stdout));
+    */
+    /*
+    stdout_buf = cout.rdbuf();
+    ofstream fout("/dev/null");
+    cout.rdbuf(fout.rdbuf());
+    */
+    freopen("/dev/null", "w", stdout);
   }
 }
 void stdout_unsilence(){
   if(stdout_silenced){
     stdout_silenced = false;
+    /*
     fflush(stdout);
     dup2(stdout_fd, fileno(stdout));
     close(stdout_fd);
     fsetpos(stdout, &stdout_pos);
+    */
+    /*
+    cout.rdbuf(stdout_buf);
+    */
+    freopen("/dev/tty", "w", stdout);
   }
 }
 
-void ui_add_chatmessage_raw(string message, string type="light"){
+void ui_chat_message_add_raw(string message, string type="light"){
   LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
   LCUI_Widget message_widget = LCUIWidget_New("alert");
   Widget_AddClass(message_widget, "alert");
@@ -82,15 +101,16 @@ void net_worker(wchar_t* server, wchar_t* username){
       cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
       if(payload["t"] == "motd"){
         cout << "motd: " << payload["d"]["m"] << endl;
-        ui_add_chatmessage_raw("MOTD: "+payload["d"].value("m", "<error>"), "light");
+        ui_chat_message_add_raw("MOTD: "+payload["d"].value("m", "<error>"), "light");
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
-      ui_add_chatmessage_raw("Connected to server", "success");
+      ui_chat_message_add_raw("Connected to server", "success");
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
+      ui_chat_message_add_raw("Disconnected from server", "danger");
     };
     // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
     net_client->on_error = [](shared_ptr<WsClient::Connection> connection, const SimpleWeb::error_code &ec) {
@@ -98,13 +118,13 @@ void net_worker(wchar_t* server, wchar_t* username){
       switch(ec.value()){
         case 111: // connection refused
           cout << "ECONNREFUSED" << endl;
-          ui_add_chatmessage_raw("Connection refused", "danger");
+          ui_chat_message_add_raw("Connection refused", "danger");
           break;
         case 125: // socket closed mid-operation, this is fine
           cout << "Action canceled" << endl;
         default:
           cout << "Unhandled error" << endl;
-          ui_add_chatmessage_raw("Unhandled error: "+ec.message(), "danger");
+          ui_chat_message_add_raw("Unhandled error: "+ec.message(), "danger");
       }
     };
 
@@ -176,8 +196,13 @@ int ui_worker(){
   LCUIEx_Init();
   stdout_unsilence();
 
+  const char* raw_xml_main =
+    #include "main.xml"
+  ;
+
   root = LCUIWidget_GetRoot();
-  pack = LCUIBuilder_LoadFile("main.xml");
+  pack = LCUIBuilder_LoadString(raw_xml_main, string(raw_xml_main).size());
+
   if(!pack)
     return -1;
 
@@ -186,9 +211,18 @@ int ui_worker(){
   Widget_Append(root, pack);
   Widget_Unwrap(pack);
 
-  ui_populate_fields();
+  const char* raw_css_lcui =
+    #include "lcui.css"
+  ;
+  const char* raw_css_main =
+    #include "main.css"
+  ;
 
-  ui_add_chatmessage_raw("Welcome to cetrinet", "success");
+  LCUI_LoadCSSString(raw_css_lcui, NULL);
+  LCUI_LoadCSSString(raw_css_main, NULL);
+
+  ui_populate_fields();
+  ui_chat_message_add_raw("Welcome to cetrinet", "success");
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
@@ -197,7 +231,7 @@ int ui_worker(){
 }
 
 int main(){
-  cout << "Hello, world!" << endl;
+  cout << "Hello, cetrinet!" << endl;
 
   cout << "Starting UI worker" << endl;
   threads.push_back(new thread(ui_worker));

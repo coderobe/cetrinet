@@ -5,7 +5,8 @@ CFLAGS+=-pthread -Og -std=c++17
 LDFLAGS+=
 
 INCLUDE = -Iinclude
-LIBS = -Llib -lLCUI -lLCUIEx -lssl -lcrypto -lboost_system
+LIBS = -Llib -lssl -lcrypto -lxml2 -lfreetype -lpng -ljpeg -lX11
+LIBS += -Wl,-Bstatic -lboost_system -lLCUI -lLCUIEx -Wl,-Bdynamic
 
 SOURCES=src/cetrinet.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -26,12 +27,12 @@ run: ${TARGET}
 
 .PHONY: all build debug
 
-all: build run
+all: clean build run
 
 assets:
-	cp src/*.xml src/*.css src/*.ttf ${OUTDIR}
+	cp src/*.ttf ${OUTDIR}
 
-build: ${TARGET} assets
+build: ${TARGET}
 
 debug: CFLAGS+=-ggdb -D_DEBUG
 debug: build
