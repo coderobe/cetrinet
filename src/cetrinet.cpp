@@ -1,11 +1,12 @@
-#include <simple-websocket-server/client_ws.hpp>
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
 #include <thread>
 #include <chrono>
 #include <string>
+
+#include <simple-websocket-server/client_ws.hpp>
+#include <nlohmann/json.hpp>
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -19,6 +20,7 @@ extern "C" {
 
 using namespace std;
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
+using json = nlohmann::json;
 
 vector<thread*> threads;
 fpos_t stdout_pos;
@@ -62,21 +64,28 @@ void net_worker(wchar_t* server, wchar_t* username){
 
     net_client = new WsClient(buffer);
     net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::Message> message){
-      cout << "message: " << message->string() << endl;
+      string msg = string(message->string());
+      json payload = json::from_msgpack(msg.data());
+      cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
+      if(payload["t"] == "motd"){
+        cout << "motd: " << payload["d"]["m"] << endl;
+      }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
-      cout << "closed connection" << endl;
+      cout << "connection closed" << endl;
     };
     // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
     net_client->on_error = [](shared_ptr<WsClient::Connection> connection, const SimpleWeb::error_code &ec) {
-      cerr << "error " << ec << ", message: " << ec.message() << endl;
+      cerr << "info " << ec << ", message: " << ec.message() << endl;
       switch(ec.value()){
         case 111: // connection refused
           cout << "ECONNREFUSED" << endl;
           break;
+        case 125: // socket closed mid-operation, this is fine
+          cout << "Action canceled" << endl;
         default:
           cout << "Unhandled error" << endl;
       }
@@ -105,6 +114,43 @@ void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   threads.push_back(new thread(net_worker, server, username));
 }
 
+void ui_add_tile(LCUI_Widget parent){
+  LCUI_Widget tile = LCUIWidget_New("textview");
+  Widget_AddClass(tile, "playtile");
+  Widget_Append(parent, tile);
+}
+
+void ui_populate_fields(){
+  // playfields
+  for(size_t playernum = 1; playernum < 10; playernum++){
+    char buffer[100];
+    snprintf(buffer, 100, "playfield-%d", playernum);
+    LCUI_Widget field = LCUIWidget_GetById(buffer);
+    for(size_t row_n = 0; row_n < 20; row_n++){
+      LCUI_Widget row = LCUIWidget_New(NULL);
+      Widget_AddClass(row, "row");
+      for(size_t col_n = 0; col_n < 12; col_n++){
+        ui_add_tile(row);
+      }
+      Widget_Append(field, row);
+    }
+  }
+  // previews
+  for(size_t previewnum = 1; previewnum < 7; previewnum++){
+    char buffer[100];
+    snprintf(buffer, 100, "previewfield-%d", previewnum);
+    LCUI_Widget field = LCUIWidget_GetById(buffer);
+    for(size_t row_n = 0; row_n < 6; row_n++){
+      LCUI_Widget row = LCUIWidget_New(NULL);
+      Widget_AddClass(row, "row");
+      for(size_t col_n = 0; col_n < 6; col_n++){
+        ui_add_tile(row);
+      }
+      Widget_Append(field, row);
+    }
+  }
+}
+
 int ui_worker(){
   LCUI_Widget root, pack;
 
@@ -122,6 +168,8 @@ int ui_worker(){
   Widget_SetTitleW(root, L"cetrinet");
   Widget_Append(root, pack);
   Widget_Unwrap(pack);
+
+  ui_populate_fields();
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
