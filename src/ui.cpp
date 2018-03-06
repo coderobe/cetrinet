@@ -6,12 +6,18 @@ atomic<bool> ui_active = false;
 
 void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   LCUI_Widget server_widget = LCUIWidget_GetById("input-data-server");
+  LCUI_Widget port_widget = LCUIWidget_GetById("input-data-port");
   LCUI_Widget username_widget = LCUIWidget_GetById("input-data-username");
 
   TextEdit_GetTextW(server_widget, 0, 255, server);
+  TextEdit_GetTextW(port_widget, 0, 255, port);
   TextEdit_GetTextW(username_widget, 0, 255, username);
 
-  util::thread_start_net(server, username);
+  util::thread_start_net(server, port, username);
+}
+
+void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
+  cout << "onChatTextInput" << endl;
 }
 
 void ui_chat_message_add_raw(string message, string type){
@@ -25,6 +31,24 @@ void ui_chat_message_add_raw(string message, string type){
     wstring message_wide = wstring(message.begin(), message.end());
     TextView_SetTextW(message_widget, message_wide.c_str());
     Widget_Append(chat, message_widget);
+  }
+}
+
+void ui_chat_scroller_worker(){
+  while(!ui_active){ // wait for UI
+    this_thread::sleep_for(chrono::milliseconds(10));
+  }
+
+  LCUI_Widget scrollbar = LCUIWidget_GetById("chatarea-scrollbar");
+  size_t pos = ScrollBar_GetPosition(scrollbar);
+  while(ui_active){
+    ScrollBar_SetPosition(scrollbar, pos+1);
+    if(pos == ScrollBar_GetPosition(scrollbar)){
+      this_thread::sleep_for(chrono::milliseconds(50));
+    }else{
+      this_thread::sleep_for(chrono::milliseconds(1));
+    }
+    pos = ScrollBar_GetPosition(scrollbar);
   }
 }
 
@@ -102,10 +126,12 @@ void ui_worker(){
   LCUI_LoadCSSString(raw_css_main, NULL);
 
   ui_populate_fields();
+
   ui_chat_message_add_raw("Welcome to cetrinet", "success");
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
+  Widget_BindEvent(LCUIWidget_GetById("chatarea-input"), "textinput", onChatTextInput, NULL, NULL);
 
   LCUI_Main();
   ui_active = false;
