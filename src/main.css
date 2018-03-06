@@ -1,3 +1,5 @@
+R"(
+
 .modal {
 	background-color: rgba(250, 250, 250, 0.8);
 	border: 1px;
@@ -176,3 +178,5 @@
 .col {
   flex-wrap: nowrap;
 }
+
+)"
