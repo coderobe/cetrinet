@@ -140,14 +140,7 @@
       </w>
       <!-- Chat -->
       <w class="chatarea">
-        <w class="chatarea-output">
-          <w type="alert" class="alert alert-light">
-            The MOTD is "here be dragons"
-          </w>
-          <w type="alert" class="alert alert-danger">
-            Server: hello, world!
-          </w>
-        </w>
+        <w id="chatarea-output" class="chatarea-output"/>
         <w class="chatarea-input" type="textedit" placeholder="Enter message..."/>
       </w>
       <!-- About modal -->
@@ -160,7 +153,7 @@
           </w>
           <w class="modal-body">
             <w type="p">
-              Version 0.1.0
+              Version 0.2.0
             </w>
             <w type="button" class="btn btn-danger btn-block" data-dismiss="modal">
               Go Back

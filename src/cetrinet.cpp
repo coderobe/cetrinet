@@ -14,6 +14,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 #include <LCUI/gui/widget/textedit.h>
+#include <LCUI/gui/widget/textview.h>
 extern "C" {
   #include <LCUIEx.h>
 }
@@ -46,6 +47,18 @@ void stdout_unsilence(){
   }
 }
 
+void ui_add_chatmessage_raw(string message, string type="light"){
+  LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
+  LCUI_Widget message_widget = LCUIWidget_New("alert");
+  Widget_AddClass(message_widget, "alert");
+  char buffer[100];
+  snprintf(buffer, 100, "alert-%s", type.c_str());
+  Widget_AddClass(message_widget, buffer);
+  wstring message_wide = wstring(message.begin(), message.end());
+  TextView_SetTextW(message_widget, message_wide.c_str());
+  Widget_Append(chat, message_widget);
+}
+
 wchar_t server[256];
 wchar_t username[256];
 WsClient* net_client = nullptr;
@@ -69,10 +82,12 @@ void net_worker(wchar_t* server, wchar_t* username){
       cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
       if(payload["t"] == "motd"){
         cout << "motd: " << payload["d"]["m"] << endl;
+        ui_add_chatmessage_raw("MOTD: "+payload["d"].value("m", "<error>"), "light");
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
+      ui_add_chatmessage_raw("Connected to server", "success");
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
@@ -83,11 +98,13 @@ void net_worker(wchar_t* server, wchar_t* username){
       switch(ec.value()){
         case 111: // connection refused
           cout << "ECONNREFUSED" << endl;
+          ui_add_chatmessage_raw("Connection refused", "danger");
           break;
         case 125: // socket closed mid-operation, this is fine
           cout << "Action canceled" << endl;
         default:
           cout << "Unhandled error" << endl;
+          ui_add_chatmessage_raw("Unhandled error: "+ec.message(), "danger");
       }
     };
 
@@ -170,6 +187,8 @@ int ui_worker(){
   Widget_Unwrap(pack);
 
   ui_populate_fields();
+
+  ui_add_chatmessage_raw("Welcome to cetrinet", "success");
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
