@@ -43,7 +43,7 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
         event.load_json(payload);
 
         cout << "motd: " << event.message << endl;
-        ui_chat_message_add_raw("MOTD: "+event.message, "light");
+        ui_chat_message_add_raw("MOTD: "+event.message, "dark");
       }else if(payload["t"] == "cmsg"){
         proto::cmsg event = proto::cmsg();
         event.load_json(payload);
