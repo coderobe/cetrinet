@@ -11,6 +11,7 @@
 ### Optional
 - make
 - minify https://github.com/tdewolff/minify
+- upx https://github.com/upx/upx
 
 ## Build
 

@@ -2,14 +2,15 @@ CXX:=clang++
 
 TARGET=build/cetrinet
 
-.PHONY: all build pack clean
+.PHONY: all build release clean
 
 all: build
 
-build: build/build.ninja
+build/cetrinet: build/build.ninja
 	(cd build && ninja)
 
-pack: ${TARGET}
+release: ${TARGET}
+	strip ${TARGET}
 	upx --best ${TARGET}
 
 clean:
