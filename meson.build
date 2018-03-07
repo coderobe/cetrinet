@@ -17,7 +17,6 @@ add_project_link_arguments(
 
 glob = run_command('meson/wildcard', 'src/**/*.cpp')
 sources = glob.stdout().strip().split('\n')
-#include = include_directories('include')
 
 dependencies = [
   dependency('threads'),
@@ -30,10 +29,9 @@ dependencies = [
 # Generate assets
 assets = run_command('meson/assets', 'assets')
 
-# Build executable
 exe = executable(
   'cetrinet',
   sources: sources,
   dependencies: dependencies,
-#  include_directories: include,
+  gui_app: true,
 )
