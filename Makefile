@@ -13,7 +13,7 @@ pack: ${TARGET}
 	upx --best ${TARGET}
 
 clean:
-	rm -r build assets
+	rm -rf build assets
 
 
 build/build.ninja:
