@@ -7,7 +7,7 @@ TARGET=build/cetrinet
 all: build/cetrinet
 
 build/cetrinet: build/build.ninja $(shell meson/wildcard 'src/**/*')
-	(cd build && ninja)
+	ninja -C build 2>&1 | sed -u -E 's/\.\.\/(src\/)/\1/'
 
 release: ${TARGET}
 	strip ${TARGET}
