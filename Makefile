@@ -1,48 +1,23 @@
-CC:=clang++
-LD:=clang++
+CXX:=clang++
 
-CFLAGS+=-pthread -Os -std=c++17
-LDFLAGS+=
+TARGET=build/cetrinet
 
-INCLUDE = -Iinclude
-LIBS = -Llib -lssl -lcrypto -lxml2 -lfreetype -lpng -ljpeg -lX11
-LIBS += -Wl,-Bstatic -lboost_system -lLCUI -lLCUIEx -Wl,-Bdynamic
+.PHONY: all build pack clean
 
-SOURCES=$(wildcard src/*.cpp) $(wildcard src/proto/*.cpp)
-OBJECTS=$(SOURCES:.cpp=.o)
-OUTDIR:=bin
-TARGET:=${OUTDIR}/cetrinet
+all: build
 
-%.o: %.cpp
-	${CC} ${CFLAGS} ${INCLUDE} -c $< -o $@
+build: build/build.ninja
+	(cd build && ninja)
 
-${TARGET}: ${OBJECTS} assets/main.xml
-	mkdir -p $(dir ${TARGET})
-	${LD} ${LDFLAGS} ${CFLAGS} -o $@ $(filter-out assets/main.xml,$+) ${LIBS}
-
-run: ${TARGET}
-	(cd bin && ./$(notdir ${TARGET}))
-
-.PHONY: all build debug
-
-all: clean build run
-
-assets/main.xml: assets
-assets: src/*.css src/*.xml
-	mkdir -p assets
-	cp src/*.css assets
-	cp src/*.xml assets
-	minify src/main.xml > assets/main.xml
-
-pack: build ${TARGET}
+pack: ${TARGET}
 	upx --best ${TARGET}
 
-build: assets ${TARGET}
-release: build pack
-
-debug: CFLAGS+=-ggdb -D_DEBUG -Og
-debug: build
-
 clean:
-	rm -f ${TARGET} ${OBJECTS}
-	rm -rf assets
+	rm -r build assets
+
+
+build/build.ninja:
+	CXX=${CXX} meson . build
+
+assets/main.xml:
+	meson/assets assets
