@@ -6,8 +6,6 @@
 #include "ui.h"
 #include "util.h"
 
-#define inline_raw(...) ""#__VA_ARGS__""
-
 using namespace std;
 
 // globals

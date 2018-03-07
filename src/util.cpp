@@ -8,14 +8,24 @@ namespace util {
   void stdout_silence(){
     if(!util::stdout_silenced){
       stdout_silenced = true;
-      freopen("/dev/null", "w", stdout);
+
+      #ifdef WINDOWS
+        cerr << "util::stdout_silence() not implemented on this platform" << endl;
+      #else
+        freopen("/dev/null", "w", stdout);
+      #endif
     }
   }
 
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;
-      freopen("/dev/tty", "w", stdout);
+
+      #ifdef WINDOWS
+        cerr << "util::stdout_unsilence() not implemented on this platform" << endl;
+      #else
+        freopen("/dev/tty", "w", stdout);
+      #endif
     }
   }
 
