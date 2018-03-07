@@ -23,7 +23,7 @@ int main(){
   util::thread_start_ui();
 
   while(!threads.empty()){
-    cout << "Waiting for " << static_cast<size_t>(threads.size()) << " threads" << endl;
+    cout << "Waiting for threads..." << endl;
     thread* t = threads.front();
     threads.erase(threads.begin());
     threads.shrink_to_fit();
