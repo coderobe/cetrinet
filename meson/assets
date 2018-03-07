@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+rm -rf "${1}"
+mkdir -p "${1}"
+cp src/*.css "${1}"
+minify src/main.xml > "${1}/main.xml" || cp src/main.xml "${1}/main.xml"
