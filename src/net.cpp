@@ -5,14 +5,13 @@ using json = nlohmann::json;
 
 shared_ptr<WsClient::Connection> net_connection;
 
-void net_send(proto::base payload){
+void net_send(vector<unsigned char> data){
   if(net_client != nullptr){
     shared_ptr<WsClient::SendStream> stream = make_shared<WsClient::SendStream>();
-    vector<unsigned char> data = payload.encode();
     for(unsigned char piece : data){
       *stream << piece;
     }
-    net_connection->send(stream);
+    net_connection->send(stream, nullptr, 130);
   }
 }
 

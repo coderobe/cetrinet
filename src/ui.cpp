@@ -1,6 +1,7 @@
 #include "ui.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 atomic<bool> ui_active = false;
 
@@ -44,7 +45,7 @@ void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
     cmsg.target = "#lobby";
     cmsg.message = cmsgbuffer;
 
-    net_send(cmsg);
+    net_send(json::to_msgpack(cmsg.encode()));
 
     wcout << msgbuffer << endl;
   }

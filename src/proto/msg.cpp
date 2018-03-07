@@ -18,4 +18,12 @@ namespace proto {
 
     message = payload["d"].value("m", "<error>");
   }
+
+  json msg::encode(){
+    json payload = super::encode();
+
+    payload["d"]["m"] = message;
+
+    return payload;
+  }
 }

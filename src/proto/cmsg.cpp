@@ -21,4 +21,13 @@ namespace proto {
     target = payload["d"].value("t", "");
     source = payload["d"].value("s", "");
   }
+
+  json cmsg::encode(){
+    json payload = super::encode();
+
+    payload["d"]["t"] = target;
+    payload["d"]["s"] = source;
+
+    return payload;
+  }
 }

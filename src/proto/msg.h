@@ -16,6 +16,7 @@ namespace proto {
 
     void populate();
     void load_json(nlohmann::json payload);
+    nlohmann::json encode();
   };
 }
 

@@ -15,12 +15,11 @@ namespace proto {
     type = payload.value("t", "");
   }
 
-  std::vector<unsigned char> base::encode(json patch){
+  json base::encode(){
     json payload;
     payload["v"] = version;
     payload["t"] = type;
-    payload.merge_patch(patch);
 
-    return json::to_msgpack(payload);
+    return payload;
   }
 }
