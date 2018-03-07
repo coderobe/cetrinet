@@ -3,6 +3,19 @@
 using namespace std;
 using json = nlohmann::json;
 
+shared_ptr<WsClient::Connection> net_connection;
+
+void net_send(proto::base payload){
+  if(net_client != nullptr){
+    shared_ptr<WsClient::SendStream> stream = make_shared<WsClient::SendStream>();
+    vector<unsigned char> data = payload.encode();
+    for(unsigned char piece : data){
+      *stream << piece;
+    }
+    net_connection->send(stream);
+  }
+}
+
 void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
   if(net_client == nullptr){
     wcout << L"connecting to '" << server << L"' (port " << port << " ) as '" << username << "'" << endl;
@@ -35,6 +48,7 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
+      net_connection = connection;
       ui_chat_message_add_raw("Connected to server", "success");
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
