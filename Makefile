@@ -4,9 +4,9 @@ TARGET=build/cetrinet
 
 .PHONY: all build release clean
 
-all: build
+all: build/cetrinet
 
-build/cetrinet: build/build.ninja
+build/cetrinet: build/build.ninja $(shell meson/wildcard 'src/**/*')
 	(cd build && ninja)
 
 release: ${TARGET}
