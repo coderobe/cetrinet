@@ -7,10 +7,10 @@
 - lcui.css https://github.com/lc-ui/lcui.css
 - nlohmann/json https://github.com/nlohmann/json
 - Simple WebSocket Server https://github.com/eidheim/Simple-WebSocket-Server
-- minify https://github.com/tdewolff/minify
 
 ### Optional
 - make
+- minify https://github.com/tdewolff/minify
 
 ## Build
 
