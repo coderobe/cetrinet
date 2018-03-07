@@ -29,7 +29,7 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
 
     char buffer[256];
     //snprintf(buffer, 256, "%s:%s/", serverpath, serverport);
-    snprintf(buffer, 256, "localhost:8080/"); // TODO: remove me
+    snprintf(buffer, 256, "localhost:28420/"); // TODO: remove me
     cout << buffer << endl;
 
     net_client = new WsClient(buffer);
@@ -49,6 +49,9 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
       cout << "connection opened" << endl;
       net_connection = connection;
       ui_chat_message_add_raw("Connected to server", "success");
+      proto::auth auth = proto::auth();
+      auth.name = "TestUser#123"; // TODO: change me
+      net_send(json::to_msgpack(auth.encode()));
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
