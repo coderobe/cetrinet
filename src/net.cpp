@@ -37,12 +37,19 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
       string msg = string(message->string());
       json payload = json::from_msgpack(msg.data());
       cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
+
       if(payload["t"] == "motd"){
         proto::motd event = proto::motd();
         event.load_json(payload);
 
         cout << "motd: " << event.message << endl;
         ui_chat_message_add_raw("MOTD: "+event.message, "light");
+      }else if(payload["t"] == "cmsg"){
+        proto::cmsg event = proto::cmsg();
+        event.load_json(payload);
+
+        cout << "cmsg from '" << event.source << "': " << event.message << endl;
+        ui_chat_message_add_raw(string(event.source)+": "+string(event.message), "light");
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
