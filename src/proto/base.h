@@ -13,6 +13,7 @@ namespace proto {
 
     void populate();
     void load_json(nlohmann::json payload);
+    std::vector<unsigned char> encode(nlohmann::json patch = {});
   };
 }
 
