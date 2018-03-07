@@ -25,6 +25,7 @@ extern "C" {
 
 #include "globals.h"
 #include "util.h"
+#include "proto/cmsg.h"
 
 void ui_chat_message_add_raw(std::string message, std::string type="light");
 void ui_populate_fields();

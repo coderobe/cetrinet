@@ -18,6 +18,36 @@ void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
 
 void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   cout << "onChatTextInput" << endl;
+  string tinput = "";
+  char buffer = '\0';
+  size_t buffer_index = 0;
+  while(true){
+    wcstombs(&buffer, &event->text.text[buffer_index], 1);
+    if(buffer == '\0'){
+      break;
+    }
+    buffer_index++;
+    tinput += buffer;
+  }
+
+  char in = tinput[tinput.size()-1];
+  cout << tinput.size() << endl;
+  if(in == '\n'){
+    wchar_t msgbuffer[1024];
+    auto inputw = LCUIWidget_GetById("chatarea-input");
+    TextEdit_GetTextW(inputw, 0, 1024, msgbuffer);
+    TextEdit_ClearText(inputw);
+
+    char cmsgbuffer[1024];
+    wcstombs(cmsgbuffer, msgbuffer, 1024);
+    proto::cmsg cmsg = proto::cmsg();
+    cmsg.target = "#lobby";
+    cmsg.message = cmsgbuffer;
+
+    net_send(cmsg);
+
+    wcout << msgbuffer << endl;
+  }
 }
 
 void ui_chat_message_add_raw(string message, string type){
