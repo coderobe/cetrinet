@@ -6,7 +6,7 @@ TARGET=build/cetrinet
 
 all: build/cetrinet
 
-build/cetrinet: build/build.ninja $(shell meson/wildcard 'src/**/*')
+build/cetrinet: build/build.ninja assets/main.xml $(shell meson/wildcard 'src/**/*')
 	ninja -C build 2>&1 | sed -u -E 's/\.\.\/(src\/)/\1/'
 
 release: ${TARGET}
@@ -20,5 +20,5 @@ clean:
 build/build.ninja:
 	CXX=${CXX} meson . build
 
-assets/main.xml:
+assets/main.xml: src/main.xml
 	meson/assets assets
