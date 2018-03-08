@@ -5,15 +5,17 @@
 
 #include "ui.h"
 #include "util.h"
+#include "proto/channel.h"
 
 using namespace std;
 
 // globals
 WsClient* net_client = nullptr;
 std::vector<std::thread*> threads;
-wchar_t server[256];
-wchar_t port[256];
-wchar_t username[256];
+std::string server;
+std::string port;
+std::string username;
+std::vector<proto::channel*> channels;
 
 int main(){
   cout << "Hello, cetrinet!" << endl;
@@ -31,6 +33,11 @@ int main(){
       t->join();
     }
     delete t;
+  }
+
+  while(!channels.empty()){
+    delete channels.front();
+    channels.erase(channels.begin());
   }
 
   cout << "Done" << endl;

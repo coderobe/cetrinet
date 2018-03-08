@@ -15,24 +15,18 @@ void net_send(vector<unsigned char> data){
   }
 }
 
-void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
+void net_worker(){
   if(net_client == nullptr){
-    wcout << L"connecting to '" << server << L"' (port " << port << " ) as '" << username << "'" << endl;
-
-    char serverpath[256];
-    char serverport[256];
-    wcstombs(serverpath, server, 256);
-    wcstombs(serverport, port, 256);
-    if(string(serverport).size() < 1){
-      sprintf(serverport, "28420");
+    if(server.size() < 1){
+      server = "localhost";
+    }
+    if(port.size() < 1){
+      port = "28420";
     }
 
-    char buffer[256];
-    //snprintf(buffer, 256, "%s:%s/", serverpath, serverport);
-    snprintf(buffer, 256, "localhost:28420/"); // TODO: remove me
-    cout << buffer << endl;
+    cout << "connecting to '" << server << "' (port " << port << ") as '" << username << "'" << endl;
 
-    net_client = new WsClient(buffer);
+    net_client = new WsClient((server+":"+port+"/").c_str());
     net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::Message> message){
       string msg = string(message->string());
       json payload = json::from_msgpack(msg.data());
@@ -54,6 +48,13 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
         proto::join event = proto::join();
         event.load_json(payload);
 
+        if(event.user == username){
+          for(proto::channel* chan : channels){
+            if(chan->name == event.target){
+              chan->joined = true;
+            }
+          }
+        }
         cout << "user '" << event.user << "' joined channel " << event.target << endl;
         ui_chat_message_add_raw(string(event.user)+" joined the channel", "light");
       }else if(payload["t"] == "part"){
@@ -74,6 +75,19 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
 
         cout << "cmsg from '" << event.source << "': " << event.message << endl;
         ui_chat_message_add_raw(string(event.source)+": "+string(event.message), "light");
+      }else if(payload["t"] == "channellist"){
+        proto::channellist event = proto::channellist();
+        event.load_json(payload);
+
+        for(proto::channel* chan : event.channels){
+          cout << "found channel " << chan->name << " with " << chan->users << " users" << endl;
+
+          proto::channel* channel = new proto::channel;
+          channel->name = chan->name;
+          channel->users = chan->users;
+          channel->joined = chan->joined;
+          channels.push_back(channel);
+        }
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
@@ -113,6 +127,6 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
     while(net_client != nullptr){
       this_thread::sleep_for(chrono::milliseconds(10));
     }
-    net_worker(server, port, username);
+    net_worker();
   }
 }

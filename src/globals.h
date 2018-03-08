@@ -4,14 +4,17 @@
 #include <vector>
 #include <thread>
 
+#include "proto/channel.h"
+
 #include <simple-websocket-server/client_ws.hpp>
 
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 
 extern WsClient* net_client;
 extern std::vector<std::thread*> threads;
-extern wchar_t server[256];
-extern wchar_t port[256];
-extern wchar_t username[256];
+extern std::string server;
+extern std::string port;
+extern std::string username;
+extern std::vector<proto::channel*> channels;
 
 #endif

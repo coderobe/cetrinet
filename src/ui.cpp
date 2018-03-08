@@ -14,11 +14,19 @@ void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   LCUI_Widget port_widget = LCUIWidget_GetById("input-data-port");
   LCUI_Widget username_widget = LCUIWidget_GetById("input-data-username");
 
-  TextEdit_GetTextW(server_widget, 0, 255, server);
-  TextEdit_GetTextW(port_widget, 0, 255, port);
-  TextEdit_GetTextW(username_widget, 0, 255, username);
+  // TODO: use actual size
+  size_t bufsize = 256;
+  wchar_t t_server[bufsize];
+  TextEdit_GetTextW(server_widget, 0, bufsize-1, t_server);
+  wchar_t t_port[bufsize];
+  TextEdit_GetTextW(port_widget, 0, bufsize-1, t_port);
+  wchar_t t_username[256];
+  TextEdit_GetTextW(username_widget, 0, bufsize-1, t_username);
 
-  util::thread_start_net(server, port, username);
+  server = util::wctos(t_server);
+  port = util::wctos(t_port);
+  username = util::wctos(t_username);
+  util::thread_start_net();
 }
 
 void onConnectPortInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){

@@ -25,6 +25,27 @@ namespace util {
     return LCUIWidget_GetById(id.c_str());
   }
 
+  string wctos(wchar_t* w){
+    string tinput = "";
+    char buffer = '\0';
+    size_t buffer_index = 0;
+    while(true){
+      wcstombs(&buffer, &w[buffer_index], 1);
+      if(buffer == '\0'){
+        break;
+      }
+      buffer_index++;
+      tinput += buffer;
+    }
+    return tinput;
+  }
+
+  string wctos(wchar_t* w, size_t len){
+    char out_c[len];
+    wcstombs(out_c, w, len);
+    return string(out_c);
+  }
+
   void get_char_from_textinput_event(LCUI_WidgetEvent event, char* dest){
     /*
     string tinput = "";
@@ -59,9 +80,9 @@ namespace util {
     }
   }
 
-  void thread_start_net(wchar_t* server, wchar_t* port, wchar_t* username){
+  void thread_start_net(){
     cout << "Starting net worker" << endl;
-    threads.push_back(new thread(net_worker, server, port, username));
+    threads.push_back(new thread(net_worker));
   }
 
   void thread_start_ui(){
