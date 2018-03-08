@@ -55,6 +55,7 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
       net_connection = connection;
+      ui_show_game(true);
       ui_chat_message_add_raw("Connected to server", "success");
       proto::auth auth = proto::auth();
       auth.name = "TestUser#123"; // TODO: change me
