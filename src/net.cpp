@@ -44,6 +44,12 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
 
         cout << "motd: " << event.message << endl;
         ui_chat_message_add_raw("MOTD: "+event.message, "dark");
+      }else if(payload["t"] == "part"){
+        proto::part event = proto::part();
+        event.load_json(payload);
+
+        cout << "user '" << event.user << "' parted from " << event.target << endl;
+        ui_chat_message_add_raw(string(event.user)+" left the channel", "light");
       }else if(payload["t"] == "smsg"){
         proto::smsg event = proto::smsg();
         event.load_json(payload);
