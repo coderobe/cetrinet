@@ -50,6 +50,12 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
 
         cout << "server reports error " << event.code << ": " << event.message << endl;
         ui_chat_message_add_raw("Error: "+string(event.message), "danger");
+      }else if(payload["t"] == "join"){
+        proto::join event = proto::join();
+        event.load_json(payload);
+
+        cout << "user '" << event.user << "' joined channel " << event.target << endl;
+        ui_chat_message_add_raw(string(event.user)+" joined the channel", "light");
       }else if(payload["t"] == "part"){
         proto::part event = proto::part();
         event.load_json(payload);
