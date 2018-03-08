@@ -138,6 +138,29 @@ void ui_populate_fields(){
   }
 }
 
+void ui_update_channel_state(){
+  if(ui_active){
+    LCUI_Widget dropdown = util::get_widget("dropdown-join-channel");
+    size_t channels_joinable = 0;
+    for(proto::channel* chan : channels){
+      if(!chan->joined){
+        LCUI_Widget dropdown_chan = LCUIWidget_New("textview");
+        Widget_AddClass(dropdown_chan, "dropdown-item");
+        TextView_SetText(dropdown_chan, chan->name.c_str());
+        Widget_Append(dropdown, dropdown_chan);
+        channels_joinable++;
+      }
+    }
+
+    LCUI_Widget joinbutton = util::get_widget("button-join-channel");
+    if(channels_joinable < 1){
+      Widget_Hide(joinbutton);
+    }else{
+      Widget_Show(joinbutton);
+    }
+  }
+}
+
 void ui_add_tile(LCUI_Widget parent){
   LCUI_Widget tile = LCUIWidget_New("textview");
   Widget_AddClass(tile, "playtile");
@@ -194,6 +217,7 @@ void ui_worker(){
   ui_active = true;
 
   ui_populate_fields();
+  ui_update_channel_state();
   ui_chat_message_add_raw("Welcome to cetrinet", "success");
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");

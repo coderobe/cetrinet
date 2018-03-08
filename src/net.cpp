@@ -23,6 +23,9 @@ void net_worker(){
     if(port.size() < 1){
       port = "28420";
     }
+    if(username.size() < 1){
+      username = "TestUser#123"; //TODO: change me
+    }
 
     cout << "connecting to '" << server << "' (port " << port << ") as '" << username << "'" << endl;
 
@@ -57,6 +60,7 @@ void net_worker(){
         }
         cout << "user '" << event.user << "' joined channel " << event.target << endl;
         ui_chat_message_add_raw(string(event.user)+" joined the channel", "light");
+        ui_update_channel_state();
       }else if(payload["t"] == "part"){
         proto::part event = proto::part();
         event.load_json(payload);
@@ -88,15 +92,17 @@ void net_worker(){
           channel->joined = chan->joined;
           channels.push_back(channel);
         }
+        ui_update_channel_state();
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
       net_connection = connection;
+      username = username.substr(0, username.find("#"));
       ui_show_game(true);
       ui_chat_message_add_raw("Connected to server", "success");
       proto::auth auth = proto::auth();
-      auth.name = "TestUser#123"; // TODO: change me
+      auth.name = username;
       net_send(json::to_msgpack(auth.encode()));
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
