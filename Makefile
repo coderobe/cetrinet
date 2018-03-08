@@ -11,7 +11,8 @@ build/cetrinet: build/build.ninja assets/main.xml $(shell meson/wildcard 'src/**
 
 release: ${TARGET}
 	strip -S --strip-unneeded --remove-section=.note.gnu.gold-version --remove-section=.comment --remove-section=.note --remove-section=.note.gnu.build-id --remove-section=.note.ABI-tag ${TARGET}
-	upx --brute ${TARGET}
+	sstrip ${TARGET}
+	upx --ultra-brute ${TARGET}
 
 clean:
 	rm -rf build assets
