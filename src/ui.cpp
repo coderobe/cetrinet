@@ -141,11 +141,13 @@ void ui_populate_fields(){
 void ui_update_channel_state(){
   if(ui_active){
     LCUI_Widget dropdown = util::get_widget("dropdown-join-channel");
+    //TODO: remove all channels from list before appending new ones
     size_t channels_joinable = 0;
     for(proto::channel* chan : channels){
       if(!chan->joined){
         LCUI_Widget dropdown_chan = LCUIWidget_New("textview");
         Widget_AddClass(dropdown_chan, "dropdown-item");
+        //TODO: user count in entry text?
         TextView_SetText(dropdown_chan, chan->name.c_str());
         Widget_Append(dropdown, dropdown_chan);
         channels_joinable++;
