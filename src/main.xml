@@ -11,138 +11,178 @@ R"===(<?xml version="1.0" encoding="UTF-8" ?>
           About
         </w>
       </w>
-      <!-- Playing fields -->
-      <w class="playarea">
-        <w class="row">
-          <w class="col col-4 playfield-wrapper-wrapper">
-            <!-- Game & Preview -->
-            <w class="row">
-              <w class="col col-10 playfield-wrapper">
-                <w id="playfield-1" class="playfield">
-                  <w class="row">
-                    <w type="textview" class="textview">
-                      Your Field
+      <w id="tabs" class="menubar">
+        <w type="button" class="btn btn-sm btn-outline-danger">
+          Server
+        </w>
+        <w type="button" class="btn btn-sm btn-outline-success">
+          Join Channel
+        </w>
+      </w>
+      <w id="greeter" type="modal">
+        <w type="h5">
+          Welcome to cetrinet
+        </w>
+        <w type="textview">
+          cetrinet is a multiplayer puzzle game
+        </w>
+        <w type="p"/>
+        <w type="p">
+          You're currently not connected to a server
+          To join one, click 'Connect' in the top left corner
+        </w>
+      </w>
+      <w id="game">
+        <!-- Playing fields -->
+        <w class="playarea">
+          <w class="row">
+            <w class="col col-4 playfield-wrapper-wrapper">
+              <!-- Game & Preview -->
+              <w class="row">
+                <w class="col col-10 playfield-wrapper">
+                  <w id="playfield-1" class="playfield">
+                    <w class="row">
+                      <w type="textview" class="textview">
+                        Your Field
+                      </w>
+                    </w>
+                  </w>
+                </w>
+                <w class="col col-2 playpreview-wrapper">
+                  <w class="playpreview">
+                    <!-- Preview 1 -->
+                    <w id="previewfield-1" class="playpreview-field">
+                    </w>
+                    <!-- Preview 2 -->
+                    <w id="previewfield-2" class="playpreview-field">
+                    </w>
+                    <!-- Preview 3 -->
+                    <w id="previewfield-3" class="playpreview-field">
+                    </w>
+                    <!-- Preview 4 -->
+                    <w id="previewfield-4" class="playpreview-field">
+                    </w>
+                    <!-- Preview 5 -->
+                    <w id="previewfield-5" class="playpreview-field">
+                    </w>
+                    <!-- Preview 6 -->
+                    <w id="previewfield-6" class="playpreview-field">
                     </w>
                   </w>
                 </w>
               </w>
-              <w class="col col-2 playpreview-wrapper">
-                <w class="playpreview">
-                  <!-- Preview 1 -->
-                  <w id="previewfield-1" class="playpreview-field">
+              <!-- Item box row -->
+              <w class="row itembox-wrapper">
+                <w class="col col-2" type="textview">
+                  Clear Line
+                </w>
+                <w class="playtile col col-1 item" type="textview"></w>
+                <w class="playtile col col-1 item" type="textview"></w>
+                <w class="playtile col col-1 item" type="textview"></w>
+                <w class="playtile col col-1 item" type="textview"></w>
+                <w class="playtile col col-1 item item-selected" type="textview">C</w>
+                <w class="playtile col col-1 item item-active" type="textview">G</w>
+                <w class="playtile col col-1 item item-active" type="textview">Q</w>
+                <w class="playtile col col-1 item item-active" type="textview">S</w>
+                <w class="playtile col col-1 item item-active" type="textview">R</w>
+                <w class="playtile col col-1 item item-active" type="textview">B</w>
+              </w>
+            </w>
+            <!-- Player 2 + 3 -->
+            <w class="col col-2 playfield-wrapper-secondary">
+              <w id="playfield-2" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #2
                   </w>
-                  <!-- Preview 2 -->
-                  <w id="previewfield-2" class="playpreview-field">
-                  </w>
-                  <!-- Preview 3 -->
-                  <w id="previewfield-3" class="playpreview-field">
-                  </w>
-                  <!-- Preview 4 -->
-                  <w id="previewfield-4" class="playpreview-field">
-                  </w>
-                  <!-- Preview 5 -->
-                  <w id="previewfield-5" class="playpreview-field">
-                  </w>
-                  <!-- Preview 6 -->
-                  <w id="previewfield-6" class="playpreview-field">
+                </w>
+              </w>
+              <w id="playfield-3" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #3
                   </w>
                 </w>
               </w>
             </w>
-            <!-- Item box row -->
-            <w class="row itembox-wrapper">
-              <w class="col col-2" type="textview">
-                Clear Line
+            <!-- Player 4 + 5 -->
+            <w class="col col-2 playfield-wrapper-secondary">
+              <w id="playfield-4" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #4
+                  </w>
+                </w>
               </w>
-              <w class="playtile col col-1 item" type="textview"></w>
-              <w class="playtile col col-1 item" type="textview"></w>
-              <w class="playtile col col-1 item" type="textview"></w>
-              <w class="playtile col col-1 item" type="textview"></w>
-              <w class="playtile col col-1 item item-selected" type="textview">C</w>
-              <w class="playtile col col-1 item item-active" type="textview">G</w>
-              <w class="playtile col col-1 item item-active" type="textview">Q</w>
-              <w class="playtile col col-1 item item-active" type="textview">S</w>
-              <w class="playtile col col-1 item item-active" type="textview">R</w>
-              <w class="playtile col col-1 item item-active" type="textview">B</w>
-            </w>
-          </w>
-          <!-- Player 2 + 3 -->
-          <w class="col col-2 playfield-wrapper-secondary">
-            <w id="playfield-2" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #2
+              <w id="playfield-5" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #5
+                  </w>
                 </w>
               </w>
             </w>
-            <w id="playfield-3" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #3
+            <!-- Player 6 + 7 -->
+            <w class="col col-2 playfield-wrapper-secondary">
+              <w id="playfield-6" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #6
+                  </w>
+                </w>
+              </w>
+              <w id="playfield-7" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #7
+                  </w>
                 </w>
               </w>
             </w>
-          </w>
-          <!-- Player 4 + 5 -->
-          <w class="col col-2 playfield-wrapper-secondary">
-            <w id="playfield-4" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #4
+            <!-- Player 8 + 9 -->
+            <w class="col col-2 playfield-wrapper-secondary">
+              <w id="playfield-8" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #8
+                  </w>
                 </w>
               </w>
-            </w>
-            <w id="playfield-5" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #5
-                </w>
-              </w>
-            </w>
-          </w>
-          <!-- Player 6 + 7 -->
-          <w class="col col-2 playfield-wrapper-secondary">
-            <w id="playfield-6" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #6
-                </w>
-              </w>
-            </w>
-            <w id="playfield-7" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #7
-                </w>
-              </w>
-            </w>
-          </w>
-          <!-- Player 8 + 9 -->
-          <w class="col col-2 playfield-wrapper-secondary">
-            <w id="playfield-8" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #8
-                </w>
-              </w>
-            </w>
-            <w id="playfield-9" class="playfield playfield-secondary">
-              <w class="row">
-                <w type="textview" class="textview">
-                  Player #9
+              <w id="playfield-9" class="playfield playfield-secondary">
+                <w class="row">
+                  <w type="textview" class="textview">
+                    Player #9
+                  </w>
                 </w>
               </w>
             </w>
           </w>
         </w>
-      </w>
-      <!-- Chat -->
-      <w class="chatarea">
-        <w class="view-box chatarea-output">
-          <w id="chatarea-output"/>
-          <w id="chatarea-scrollbar" type="scrollbar" target="chatarea-output"/>
+        <!-- Chat -->
+        <w id="socialbox" class="row">
+          <w class="chatarea col col-10">
+            <w class="view-box chatarea-output">
+              <w id="chatarea-output"/>
+              <w id="chatarea-scrollbar" type="scrollbar" target="chatarea-output"/>
+            </w>
+            <w id="chatarea-input" class="chatarea-input" type="textedit" placeholder="Enter message..."/>
+          </w>
+          <w id="userlist" class="col col-2">
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+            <w type="textview" class="username">TestUser</w>
+          </w>
         </w>
-        <w id="chatarea-input" class="chatarea-input" type="textedit" placeholder="Enter message..."/>
       </w>
       <!-- About modal -->
       <w id="modal-win-about" type="modal" class="modal">
