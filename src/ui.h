@@ -5,6 +5,8 @@
 #include <atomic>
 #include <thread>
 #include <iostream>
+#include <cctype>
+#include <cwchar>
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -31,6 +33,7 @@ void ui_chat_message_add_raw(std::string message, std::string type="light");
 void ui_populate_fields();
 void ui_add_tile(LCUI_Widget parent);
 void ui_chat_scroller_worker();
+void ui_show_game(bool show);
 void ui_worker();
 
 #endif

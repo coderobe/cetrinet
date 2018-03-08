@@ -5,6 +5,10 @@ using json = nlohmann::json;
 
 atomic<bool> ui_active = false;
 
+LCUI_Widget w_tabs;
+LCUI_Widget w_greeter;
+LCUI_Widget w_game;
+
 void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   LCUI_Widget server_widget = LCUIWidget_GetById("input-data-server");
   LCUI_Widget port_widget = LCUIWidget_GetById("input-data-port");
@@ -17,25 +21,29 @@ void onConnectButton(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   util::thread_start_net(server, port, username);
 }
 
-void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
-  cout << "onChatTextInput" << endl;
-  string tinput = "";
-  char buffer = '\0';
-  size_t buffer_index = 0;
-  while(true){
-    wcstombs(&buffer, &event->text.text[buffer_index], 1);
-    if(buffer == '\0'){
-      break;
-    }
-    buffer_index++;
-    tinput += buffer;
-  }
+void onConnectPortInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
+  /*
+  LCUI_Widget inputw = LCUIWidget_GetById("input-data-port");
+  size_t bufsize = TextEdit_GetTextLength(inputw);
+  wchar_t msgbuffer[bufsize];
+  TextEdit_GetTextW(inputw, 0, bufsize, msgbuffer);
+  char cmsgbuffer[bufsize];
+  wcstombs(cmsgbuffer, msgbuffer, bufsize);
+  string smsgbuffer = cmsgbuffer;
+  size_t msglen = smsgbuffer.length();
+  smsgbuffer.erase(remove_if(smsgbuffer.begin(), smsgbuffer.end(), &util::is_not_digit), smsgbuffer.end());
+  */
+  
+  //TODO: hint when port not numerical or out of range
+}
 
-  char in = tinput[tinput.size()-1];
-  cout << tinput.size() << endl;
+void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
+  char in;
+  util::get_char_from_textinput_event(event, &in);
+
   if(in == '\n'){
     wchar_t msgbuffer[1024];
-    auto inputw = LCUIWidget_GetById("chatarea-input");
+    LCUI_Widget inputw = LCUIWidget_GetById("chatarea-input");
     TextEdit_GetTextW(inputw, 0, 1024, msgbuffer);
     TextEdit_ClearText(inputw);
 
@@ -46,8 +54,6 @@ void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
     cmsg.message = cmsgbuffer;
 
     net_send(json::to_msgpack(cmsg.encode()));
-
-    wcout << msgbuffer << endl;
   }
 }
 
@@ -122,6 +128,20 @@ void ui_add_tile(LCUI_Widget parent){
   Widget_Append(parent, tile);
 }
 
+void ui_show_game(bool show){
+  if(ui_active){
+    if(show){
+      Widget_Hide(w_greeter);
+      Widget_Show(w_tabs);
+      Widget_Show(w_game);
+    }else{
+      Widget_Hide(w_game);
+      Widget_Hide(w_tabs);
+      Widget_Show(w_greeter);    
+    }
+  }
+}
+
 void ui_worker(){
   LCUI_Widget root, pack;
 
@@ -141,7 +161,7 @@ void ui_worker(){
   if(!pack)
     terminate();
 
-  LCUIDisplay_SetSize(859, 690);
+  LCUIDisplay_SetSize(860, 720);
   Widget_SetTitleW(root, L"cetrinet");
   Widget_Append(root, pack);
   Widget_Unwrap(pack);
@@ -163,6 +183,15 @@ void ui_worker(){
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
   Widget_BindEvent(connectButton, "click", onConnectButton, NULL, NULL);
   Widget_BindEvent(LCUIWidget_GetById("chatarea-input"), "textinput", onChatTextInput, NULL, NULL);
+  Widget_BindEvent(LCUIWidget_GetById("input-data-port"), "textinput", onConnectPortInput, NULL, NULL);
+
+  //Modal_Show(LCUIWidget_GetById("modal-win-connect"));
+
+  w_tabs = LCUIWidget_GetById("tabs");
+  w_greeter = LCUIWidget_GetById("greeter");
+  w_game = LCUIWidget_GetById("game");
+
+  ui_show_game(false);
 
   LCUI_Main();
   ui_active = false;

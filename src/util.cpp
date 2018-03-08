@@ -17,6 +17,36 @@ namespace util {
     }
   }
 
+  LCUI_Widget get_widget(char* id){
+    return LCUIWidget_GetById(id);
+  }
+
+  LCUI_Widget get_widget(string id){
+    return LCUIWidget_GetById(id.c_str());
+  }
+
+  void get_char_from_textinput_event(LCUI_WidgetEvent event, char* dest){
+    /*
+    string tinput = "";
+    char buffer = '\0';
+    size_t buffer_index = 0;
+    while(true){
+      wcstombs(&buffer, &event->text.text[buffer_index], 1);
+      if(buffer == '\0'){
+        break;
+      }
+      buffer_index++;
+      tinput += buffer;
+    }
+    */
+    wcstombs(dest, &event->text.text[0], 1);
+  }
+
+  bool is_not_digit(char c){
+    return !isdigit(c);
+  }
+
+
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;
