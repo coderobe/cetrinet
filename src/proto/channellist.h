@@ -5,14 +5,9 @@
 #include <nlohmann/json.hpp>
 
 #include "base.h"
+#include "channel.h"
 
 namespace proto {
-  typedef struct {
-    std::string name;
-    size_t users;
-    bool joined;
-  } channel;
-
   class channellist : public base {
   private:
     typedef base super;
