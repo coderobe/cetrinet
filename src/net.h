@@ -14,6 +14,7 @@
 #include "proto/cmsg.h"
 #include "proto/smsg.h"
 #include "proto/part.h"
+#include "proto/error.h"
 
 void net_worker(wchar_t* server, wchar_t* port, wchar_t* username);
 void net_send(std::vector<unsigned char> data);

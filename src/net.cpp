@@ -44,6 +44,12 @@ void net_worker(wchar_t* server, wchar_t* port, wchar_t* username){
 
         cout << "motd: " << event.message << endl;
         ui_chat_message_add_raw("MOTD: "+event.message, "dark");
+      }else if(payload["t"] == "error"){
+        proto::error event = proto::error();
+        event.load_json(payload);
+
+        cout << "server reports error " << event.code << ": " << event.message << endl;
+        ui_chat_message_add_raw("Error: "+string(event.message), "danger");
       }else if(payload["t"] == "part"){
         proto::part event = proto::part();
         event.load_json(payload);
