@@ -21,11 +21,16 @@ R"(
   width: 100%;
   height: 100%;
 }
+.window .menubar:first-child {
+  margin-top: 0px;
+}
 
+.menubar {
+  margin-top: 3px;
+}
 .menubar .btn {
   border-left: 0;
 }
-
 .menubar .btn:first-child {
   border-left: 1px;
 }
@@ -41,13 +46,6 @@ R"(
   border: 1px;
 }
 
-.window .menubar:first-child {
-  margin-top: 0px;
-}
-.menubar {
-  margin-top: 3px;
-}
-
 .chatarea {
   border: 1px;
   width: 99%;
@@ -59,22 +57,11 @@ R"(
   margin-left: 1px;
   margin-right: 1px;
 }
-
-#userlist {
-  border: 1px;
-  border-left: 0;
-  height: 190px;
-  max-width: 135px;
-  padding: 8px;
-  text-align: left;
-}
-
 .chatarea .chatarea-output {
   height: 160px;
   max-height: 160px;
   width: 100%;
 }
-
 .chatarea .chatarea-input {
   border-top: 1px solid #000;
   height: 30px;
@@ -83,6 +70,14 @@ R"(
 .chatarea-output .alert {
   margin-bottom: 0;
   padding: 4px;
+}
+#userlist {
+  border: 1px;
+  border-left: 0;
+  height: 190px;
+  max-width: 135px;
+  padding: 8px;
+  text-align: left;
 }
 #userlist .username {
   width: 100%;
