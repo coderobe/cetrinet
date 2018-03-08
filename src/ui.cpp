@@ -57,6 +57,14 @@ void onChatTextInput(LCUI_Widget self, LCUI_WidgetEvent event, void* arg){
   }
 }
 
+void onUIExit(LCUI_SysEvent event, void* args){
+  ui_active = false;
+
+  // give other threads time to finish their cycles before cleaning up
+  // TODO: mutex!
+  this_thread::sleep_for(chrono::milliseconds(100));
+}
+
 void ui_chat_message_add_raw(string message, string type){
   if(ui_active){
     LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
@@ -73,7 +81,7 @@ void ui_chat_message_add_raw(string message, string type){
 
 void ui_chat_scroller_worker(){
   while(!ui_active){ // wait for UI
-    this_thread::sleep_for(chrono::milliseconds(10));
+    this_thread::sleep_for(chrono::milliseconds(30));
   }
 
   LCUI_Widget scrollbar = LCUIWidget_GetById("chatarea-scrollbar");
@@ -148,7 +156,6 @@ void ui_worker(){
   util::stdout_silence();
   LCUI_Init();
   LCUIEx_Init();
-  ui_active = true;
   util::stdout_unsilence();
 
   const char* raw_xml_main =
@@ -176,8 +183,9 @@ void ui_worker(){
   LCUI_LoadCSSString(raw_css_lcui, NULL);
   LCUI_LoadCSSString(raw_css_main, NULL);
 
-  ui_populate_fields();
+  ui_active = true;
 
+  ui_populate_fields();
   ui_chat_message_add_raw("Welcome to cetrinet", "success");
 
   LCUI_Widget connectButton = LCUIWidget_GetById("input-connect");
@@ -185,7 +193,7 @@ void ui_worker(){
   Widget_BindEvent(LCUIWidget_GetById("chatarea-input"), "textinput", onChatTextInput, NULL, NULL);
   Widget_BindEvent(LCUIWidget_GetById("input-data-port"), "textinput", onConnectPortInput, NULL, NULL);
 
-  //Modal_Show(LCUIWidget_GetById("modal-win-connect"));
+  LCUI_BindEvent(LCUI_QUIT, onUIExit, NULL, NULL);
 
   w_tabs = LCUIWidget_GetById("tabs");
   w_greeter = LCUIWidget_GetById("greeter");
@@ -194,5 +202,4 @@ void ui_worker(){
   ui_show_game(false);
 
   LCUI_Main();
-  ui_active = false;
 }
