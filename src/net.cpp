@@ -32,7 +32,8 @@ void net_worker(){
     net_client = new WsClient((server+":"+port+"/").c_str());
     net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::Message> message){
       string msg = string(message->string());
-      json payload = json::from_msgpack(msg.data());
+
+      json payload = json::from_msgpack(msg);
       cout << "got message: version " << payload["v"] << ", type " << payload["t"] << endl;
 
       state_update(payload);
