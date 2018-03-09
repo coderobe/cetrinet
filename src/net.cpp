@@ -111,6 +111,7 @@ void net_worker(){
               nu->name = eu->name;
               new_users.push_back(nu);
             }
+            //TODO: clean up new_users to prevent leaking memory?
             chan->userdata.swap(new_users);
           }
         }
