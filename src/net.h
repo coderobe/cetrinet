@@ -17,6 +17,7 @@
 #include "proto/error.h"
 #include "proto/join.h"
 #include "proto/channellist.h"
+#include "proto/userlist.h"
 
 void net_worker();
 void net_send(std::vector<unsigned char> data);

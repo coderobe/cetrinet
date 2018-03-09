@@ -35,6 +35,8 @@ void ui_add_tile(LCUI_Widget parent);
 void ui_chat_scroller_worker();
 void ui_show_game(bool show);
 void ui_update_channel_state();
+void ui_update_users_state();
 void ui_worker();
+bool ui_running();
 
 #endif

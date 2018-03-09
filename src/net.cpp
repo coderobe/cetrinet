@@ -51,16 +51,21 @@ void net_worker(){
         proto::join event = proto::join();
         event.load_json(payload);
 
-        if(event.user == username){
-          for(proto::channel* chan : channels){
-            if(chan->name == event.target){
+        for(proto::channel* chan : channels){
+          if(chan->name == event.target){
+            if(event.user == username){
               chan->joined = true;
+            }else{
+              proto::user* nu = new proto::user;
+              nu->name = event.user;
+              chan->userdata.push_back(nu);
             }
           }
         }
         cout << "user '" << event.user << "' joined channel " << event.target << endl;
         ui_chat_message_add_raw(string(event.user)+" joined the channel", "light");
         ui_update_channel_state();
+        ui_update_users_state();
       }else if(payload["t"] == "part"){
         proto::part event = proto::part();
         event.load_json(payload);
@@ -93,6 +98,23 @@ void net_worker(){
           channels.push_back(channel);
         }
         ui_update_channel_state();
+      }else if(payload["t"] == "userlist"){
+        proto::userlist event = proto::userlist();
+        event.load_json(payload);
+
+        cout << "userlist for channel " << event.channel << " reports " << event.users.size() << " users" << endl;
+        for(proto::channel* chan : channels){
+          if(chan->name == event.channel){
+            vector<proto::user*> new_users;
+            for(proto::user* eu : event.users){
+              proto::user* nu = new proto::user;
+              nu->name = eu->name;
+              new_users.push_back(nu);
+            }
+            chan->userdata.swap(new_users);
+          }
+        }
+        ui_update_users_state();
       }
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
@@ -118,7 +140,12 @@ void net_worker(){
           ui_chat_message_add_raw("Connection refused", "danger");
           break;
         case 125: // socket closed mid-operation, this is fine
-          cout << "Action canceled" << endl;
+          if(!ui_running()){
+            cout << "Socket force-closed" << endl;
+          }else{
+            cout << "Action canceled" << endl;
+          }
+          break;
         default:
           cout << "Unhandled error" << endl;
           ui_chat_message_add_raw("Unhandled error: "+ec.message(), "danger");

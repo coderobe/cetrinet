@@ -73,6 +73,10 @@ void onUIExit(LCUI_SysEvent event, void* args){
   this_thread::sleep_for(chrono::milliseconds(100));
 }
 
+bool ui_running(){
+  return ui_active;
+}
+
 void ui_chat_message_add_raw(string message, string type){
   if(ui_active){
     LCUI_Widget chat = LCUIWidget_GetById("chatarea-output");
@@ -159,6 +163,21 @@ void ui_update_channel_state(){
       Widget_Hide(joinbutton);
     }else{
       Widget_Show(joinbutton);
+    }
+  }
+}
+
+void ui_update_users_state(){
+  if(ui_active){
+    LCUI_Widget userlist = util::get_widget("userlist");
+    //TODO: remove all users from list before appending new ones
+    for(proto::channel* chan : channels){
+      for(proto::user* u : chan->userdata){
+        LCUI_Widget userlist_user = LCUIWidget_New("textview");
+        Widget_AddClass(userlist_user, "username");
+        TextView_SetText(userlist_user, u->name.c_str());
+        Widget_Append(userlist, userlist_user);
+      }
     }
   }
 }

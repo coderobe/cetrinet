@@ -168,19 +168,6 @@ R"===(<?xml version="1.0" encoding="UTF-8" ?>
             <w id="chatarea-input" class="chatarea-input" type="textedit" placeholder="Enter message..."/>
           </w>
           <w id="userlist" class="col col-2">
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
-            <w type="textview" class="username">TestUser</w>
           </w>
         </w>
       </w>
