@@ -8,6 +8,7 @@
 
 #include "globals.h"
 #include "ui.h"
+#include "state.h"
 
 #include "proto/motd.h"
 #include "proto/auth.h"
