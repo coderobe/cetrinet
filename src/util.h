@@ -8,12 +8,6 @@
 #include <cstdlib>
 #include <string>
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#undef max
-#undef min
-
 #include "globals.h"
 #include "net.h"
 

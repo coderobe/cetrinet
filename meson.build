@@ -34,9 +34,6 @@ dependencies = [
   dependency('fontconfig'),
 ]
 
-# Generate assets
-assets = run_command('meson/assets', 'assets')
-
 exe = executable(
   'cetrinet',
   sources: sources,
