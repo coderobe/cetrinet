@@ -42,15 +42,15 @@ void net_worker(){
       cout << "connection opened" << endl;
       net_connection = connection;
       username = username.substr(0, username.find("#"));
-      ui_show_game(true);
-      ui_chat_message_add_raw("Connected to server", "success");
+      //TODO: ui_show_game(true);
+      //TODO: ui_chat_message_add_raw("Connected to server", "success");
       proto::auth auth = proto::auth();
       auth.name = username;
       net_send(json::to_msgpack(auth.encode()));
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
-      ui_chat_message_add_raw("Disconnected from server", "danger");
+      //TODO: ui_chat_message_add_raw("Disconnected from server", "danger");
     };
     // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
     net_client->on_error = [](shared_ptr<WsClient::Connection> connection, const SimpleWeb::error_code &ec) {
@@ -58,7 +58,7 @@ void net_worker(){
       switch(ec.value()){
         case 111: // connection refused
           cout << "ECONNREFUSED" << endl;
-          ui_chat_message_add_raw("Connection refused", "danger");
+          //TODO: ui_chat_message_add_raw("Connection refused", "danger");
           break;
         case 125: // socket closed mid-operation, this is fine
           if(!ui_running()){
@@ -69,7 +69,7 @@ void net_worker(){
           break;
         default:
           cout << "Unhandled error" << endl;
-          ui_chat_message_add_raw("Unhandled error: "+ec.message(), "danger");
+          //TODO: ui_chat_message_add_raw("Unhandled error: "+ec.message(), "danger");
       }
     };
 

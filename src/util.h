@@ -22,12 +22,7 @@ namespace util{
   void stdout_unsilence();
   void thread_start_net();
   void thread_start_ui();
-  void get_char_from_textinput_event(LCUI_WidgetEvent event, char* dest);
   bool is_not_digit(char c);
-  std::string wctos(wchar_t* w, size_t len);
-  std::string wctos(wchar_t* w);
-  LCUI_Widget get_widget(std::string id);
-  LCUI_Widget get_widget(char* id);
 };
 
 #endif

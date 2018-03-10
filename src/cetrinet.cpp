@@ -16,6 +16,7 @@ std::string server;
 std::string port;
 std::string username;
 std::vector<proto::channel*> channels;
+sf::RenderWindow window(sf::VideoMode(800, 700), "cetrinet");
 
 int main(){
   cout << "Hello, cetrinet!" << endl;

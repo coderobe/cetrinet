@@ -5,21 +5,21 @@ project('cetrinet', 'cpp',
 )
 
 add_project_arguments(
-  '-Os',
-  '-ffast-math',
-  '-fno-math-errno',
-  '-fno-ident',
-  '-ffunction-sections',
-  '-fdata-sections',
-  '-fmerge-all-constants',
+#  '-Os',
+#  '-ffast-math',
+#  '-fno-math-errno',
+#  '-fno-ident',
+#  '-ffunction-sections',
+#  '-fdata-sections',
+#  '-fmerge-all-constants',
   language: 'cpp',
 )
 
 add_project_link_arguments(
 #  '-static',
 #  '-Wl,-Bstatic', #TODO: proper static build
-  '-s',
-  '-Wl,--gc-sections',
+#  '-s',
+#  '-Wl,--gc-sections',
   language: 'cpp',
 )
 
@@ -30,8 +30,8 @@ dependencies = [
   dependency('threads'),
   dependency('openssl'),
   dependency('boost', modules: ['system']),
-  dependency('lcui'),
-  dependency('lcuiex'),
+  dependency('tgui'),
+  dependency('fontconfig'),
 ]
 
 # Generate assets
