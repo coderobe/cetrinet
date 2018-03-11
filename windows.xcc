@@ -1,6 +1,7 @@
 [binaries]
-c = '/usr/bin/x86_64-w64-mingw32-gcc'
-cpp = '/usr/bin/x86_64-w64-mingw32-g++'
+c = '/usr/bin/x86_64-w64-mingw32-clang'
+cpp = '/usr/bin/x86_64-w64-mingw32-clang++'
+ld = '/usr/bin/x86_64-w64-mingw32-g++'
 ar = '/usr/bin/x86_64-w64-mingw32-ar'
 strip = '/usr/bin/x86_64-w64-mingw32-strip'
 pkgconfig = '/usr/bin/x86_64-w64-mingw32-pkg-config'
@@ -13,5 +14,5 @@ cpu = 'i686'
 endian = 'little'
 
 [properties]
-cxx_args = ['-DWINDOWS=1', '-static-libgcc', '-static-libstdc++']
-ld_args = ['-static', '-mwindows']
+cpp_args = ['-DWINDOWS=1', '-Wno-incompatible-ms-struct', '-Xclang', '-flto-visibility-public-std']
+cpp_link_args = []

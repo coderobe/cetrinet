@@ -57,6 +57,7 @@ namespace util {
 
   void thread_start_ui(){
     cout << "Starting UI worker" << endl;
+    //https://github.com/SFML/SFML/blob/master/src/SFML/Window/OSX/SFWindowController.mm#L563-L580
     //threads.push_back(new thread(ui_worker));
     ui_worker();
   }
