@@ -78,6 +78,7 @@ void net_worker(){
           util::add_message("server", "cetrinet", "connection refused", (unsigned char[3]){100, 0, 0});
           break;
         case 125: // socket closed mid-operation, this is fine
+        case 995:
           if(!ui_running()){
             cout << "Socket force-closed" << endl;
           }else{
@@ -86,7 +87,7 @@ void net_worker(){
           break;
         default:
           cout << "Unhandled error" << endl;
-          util::add_message("server", "cetrinet", "Unhandled error: "+ec.message(), (unsigned char[3]){100, 0, 0});
+          util::add_message("server", "cetrinet", "Unhandled error " + to_string(ec.value()) + ": "+ec.message(), (unsigned char[3]){100, 0, 0});
       }
     };
 
