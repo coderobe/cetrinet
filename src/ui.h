@@ -16,6 +16,8 @@
 #include "proto/cmsg.h"
 
 void ui_worker();
+void ui_update_chats();
+void ui_update_channels();
 bool ui_running();
 
 #endif

@@ -34,7 +34,38 @@ void ui_gui_set_font(T gui, string font){
   #endif
 }
 
+string ui_channel_current = "#lobby";
+
+void ui_update_chats(){
+  tgui::ChatBox::Ptr chat_server = static_pointer_cast<tgui::ChatBox>(gui.get("panel_server_chat", true));
+  tgui::ChatBox::Ptr chat_channel = static_pointer_cast<tgui::ChatBox>(gui.get("panel_channel_chat", true));
+
+  chat_server->removeAllLines();
+  chat_channel->removeAllLines();
+  for(auto msg : server_messages){
+    if(msg->to == "server"){
+      chat_server->addLine(msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+    }
+    if(msg->to == ui_channel_current || msg->to == "server"){
+      chat_channel->addLine(msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+    }
+  }
+}
+
+void ui_update_channels(){
+  tgui::Tab::Ptr tabs = static_pointer_cast<tgui::Tab>(gui.get("tab_channels", true));
+
+  tabs->removeAll();
+  tabs->add("Server");
+  for(auto chan : channels){
+    if(chan->joined){
+      tabs->add(chan->name);
+    }
+  }
+}
+
 void onTabSelected(tgui::Gui& gui, string tab){
+  ui_channel_current = tab;
   if(tab == "Server"){
     gui.get("panel_server")->show();
     gui.get("panel_channel")->hide();
@@ -44,17 +75,86 @@ void onTabSelected(tgui::Gui& gui, string tab){
   }
 }
 
+void onMenuSelected(tgui::Gui& gui, string menu){
+  cout << menu << endl;
+  if(menu == "Connect"){
+    auto msgbox = tgui::MessageBox::create();
+    gui.add(msgbox);
+    msgbox->setSize({300, 220});
+    msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
+
+    auto content = tgui::Panel::create();
+    msgbox->add(content);
+    content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+    content->setBackgroundColor(color_white);
+
+    auto label_header = tgui::Label::create();
+    content->add(label_header);
+    label_header->setPosition(8, 8);
+    label_header->setTextSize(18);
+    label_header->setText("Connect to Server");
+
+    auto label_server = tgui::Label::create();
+    content->add(label_server);
+    label_server->setPosition(8, bindBottom(label_header));
+    label_server->setTextSize(14);
+    label_server->setText("Server");
+
+    auto edit_server = tgui::EditBox::create();
+    content->add(edit_server);
+    edit_server->setPosition(8, bindBottom(label_server));
+    edit_server->setTextSize(14);
+    edit_server->setSize(bindWidth(content)-8*2, bindHeight(label_server));
+    edit_server->setDefaultText("rrerrware.download");
+
+    auto label_port = tgui::Label::create();
+    content->add(label_port);
+    label_port->setPosition(8, bindBottom(edit_server)+8);
+    label_port->setTextSize(14);
+    label_port->setText("Port");
+
+    auto edit_port = tgui::EditBox::create();
+    content->add(edit_port);
+    edit_port->setPosition(8, bindBottom(label_port));
+    edit_port->setTextSize(14);
+    edit_port->setSize(bindWidth(content)-8*2, bindHeight(label_port));
+    edit_port->setDefaultText("28420");
+
+    auto label_username = tgui::Label::create();
+    content->add(label_username);
+    label_username->setPosition(8, bindBottom(edit_port)+8);
+    label_username->setTextSize(14);
+    label_username->setText("Username");
+
+    auto edit_username = tgui::EditBox::create();
+    content->add(edit_username);
+    edit_username->setPosition(8, bindBottom(label_username));
+    edit_username->setTextSize(14);
+    edit_username->setSize(bindWidth(content)-8*2, bindHeight(label_username));
+    edit_username->setDefaultText("cetrinet user");
+
+    auto button_connect = tgui::Button::create();
+    content->add(button_connect);
+    button_connect->setPosition(8, bindBottom(edit_username)+8*2);
+    button_connect->setTextSize(14);
+    button_connect->setSize(bindWidth(content)-8*2, bindHeight(label_header));
+    button_connect->setText("Connect");
+    button_connect->connect("pressed", [=](){
+      msgbox->getParent()->remove(msgbox);
+      server = edit_server->getText();
+      port = edit_port->getText();
+      username = edit_username->getText();
+      util::thread_start_net();
+    });
+  }else if(menu == "About"){
+    auto msgbox = tgui::MessageBox::create();
+    msgbox->setText("Hello, world!");
+    gui.add(msgbox);
+  }
+  window.setActive(true);
+}
+
 void ui_worker(){
-  window.setFramerateLimit(60);
-  static tgui::Gui gui(window);
-
-  sf::Color color_white = sf::Color(255, 255, 255, 255);
-  sf::Color color_black = sf::Color(0, 0, 0, 255);
-  sf::Color color_grey = sf::Color(200, 200, 200, 255);
-  sf::Color color_red = sf::Color(255, 0, 0, 255);
-  sf::Color color_green = sf::Color(0, 255, 0, 255);
-  sf::Color color_blue = sf::Color(0, 0, 255, 255);
-
   try{
     ui_gui_set_font(&gui, "sans");
 
@@ -63,19 +163,20 @@ void ui_worker(){
 
     auto menubar = tgui::MenuBar::create();
     menubar->setSize(window.getSize().x, 20);
-    menubar->addMenu("Connect");
-    menubar->addMenu("About");
+    menubar->addMenu("Connection");
+    menubar->addMenuItem("Connect");
+    menubar->addMenu("Help");
+    menubar->addMenuItem("About");
+    menubar->connect("MenuItemClicked", onMenuSelected, std::ref(gui));
     gui.add(menubar);
 
     auto tabs = tgui::Tab::create();
+    gui.add(tabs, "tab_channels");
     tabs->setTabHeight(20);
     tabs->setPosition(padding+2, 25);
     tabs->setTextSize(font_size);
-    tabs->add("Server");
-    tabs->add("#lobby");
-    tabs->select("Server");
+    ui_update_channels();
     tabs->connect("TabSelected", onTabSelected, std::ref(gui));
-    gui.add(tabs);
 
     size_t panel_offset = 50;
 
@@ -84,21 +185,22 @@ void ui_worker(){
     panel_server->setPosition(padding, panel_offset);
     gui.add(panel_server, "panel_server");
 
-    auto panel_server_chat = tgui::ListBox::create();
+    auto panel_server_chat = tgui::ChatBox::create();
     panel_server_chat->setSize(panel_server->getSize().x, panel_server->getSize().y*0.96);
     panel_server_chat->setPosition(0, 0);
     panel_server_chat->setTextSize(font_size);
     ui_gui_set_font(panel_server_chat, "monospace");
-    panel_server->add(panel_server_chat);
+    panel_server->add(panel_server_chat, "panel_server_chat");
     auto panel_server_chat_input = tgui::EditBox::create();
     panel_server_chat_input->setSize(panel_server->getSize().x, panel_server->getSize().y*0.04);
     panel_server_chat_input->setPosition(0, panel_server_chat->getSize().y);
     panel_server_chat_input->setTextSize(font_size);
+    panel_server_chat_input->setDefaultText("Enter message...");
     ui_gui_set_font(panel_server_chat_input, "monospace");
     panel_server->add(panel_server_chat_input);
 
     //TODO: remove
-    panel_server_chat->addItem("Welcome to cetrinet");
+    panel_server_chat->addLine("Welcome to cetrinet");
 
     //TODO: dynamic creation
     auto panel_channel = tgui::Panel::create();
@@ -263,7 +365,7 @@ void ui_worker(){
     }
 
     auto game_field_secondary = tgui::Panel::create();
-    game_field_secondary->setBackgroundColor(color_blue);
+    game_field_secondary->setBackgroundColor(color_grey);
     game_field_secondary->setSize((game_row_w*game_secondary_tile_size+border_weight*(game_row_w+1))*4, (game_row_h*game_secondary_tile_size+border_weight*game_row_h)*2+1);
     game_field_secondary->setPosition(bindRight(game_field_main_preview)+padding, 0);
     panel_channel->add(game_field_secondary, "game_field_secondary");
@@ -278,22 +380,22 @@ void ui_worker(){
     panel_channel_chat_box->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
     panel_channel->add(panel_channel_chat_box);
     
-    auto panel_channel_chat = tgui::ListBox::create();
+    auto panel_channel_chat = tgui::ChatBox::create();
     panel_channel_chat->setSize(bindWidth(panel_channel_chat_box), bindHeight(panel_channel_chat_box)*0.85);
     panel_channel_chat->setPosition(0, 0);
     panel_channel_chat->setTextSize(font_size);
     ui_gui_set_font(panel_channel_chat, "monospace");
-    panel_channel_chat_box->add(panel_channel_chat);
-
-    //TODO: remove
-    panel_channel_chat->addItem("Welcome to cetrinet");
-    
+    panel_channel_chat_box->add(panel_channel_chat, "panel_channel_chat");
+   
     auto panel_channel_chat_input = tgui::EditBox::create();
     panel_channel_chat_input->setSize(bindWidth(panel_channel_chat_box), bindHeight(panel_channel_chat_box)*0.15);
     panel_channel_chat_input->setPosition(0, bindBottom(panel_channel_chat));
     panel_channel_chat_input->setTextSize(font_size);
+    panel_channel_chat_input->setDefaultText("Enter message...");
     ui_gui_set_font(panel_channel_chat_input, "monospace");
     panel_channel_chat_box->add(panel_channel_chat_input);
+
+    menubar->moveToFront();
 
   }catch(const tgui::Exception& e){
     cerr << "TGUI Exception: " << e.what() << endl;

@@ -9,13 +9,14 @@ void state_update(json payload){
     event.load_json(payload);
 
     cout << "motd: " << event.message << endl;
-    //TODO: ui_chat_message_add_raw("MOTD: "+event.message, "dark");
+
+    util::add_message("server", "MOTD", event.message, (unsigned char[3]){0, 0, 100});
   }else if(payload["t"] == "error"){
     proto::error event = proto::error();
     event.load_json(payload);
 
     cout << "server reports error " << event.code << ": " << event.message << endl;
-    //TODO: ui_chat_message_add_raw("Error: "+string(event.message), "danger");
+    util::add_message("server", "Error", event.message, (unsigned char[3]){100, 0, 0});
   }else if(payload["t"] == "join"){
     proto::join event = proto::join();
     event.load_json(payload);
@@ -29,30 +30,30 @@ void state_update(json payload){
           nu->name = event.user;
           chan->userdata.push_back(nu);
         }
+        ui_update_channels();
       }
     }
     cout << "user '" << event.user << "' joined channel " << event.target << endl;
-    //TODO: ui_chat_message_add_raw(string(event.user)+" joined the channel", "light");
-    //TODO: ui_update_channel_state();
+    util::add_message(event.target, "Join", event.user+" joined the channel", (unsigned char[3]){0, 0, 100});
     //TODO: ui_update_users_state();
   }else if(payload["t"] == "part"){
     proto::part event = proto::part();
     event.load_json(payload);
 
     cout << "user '" << event.user << "' parted from " << event.target << endl;
-    //TODO: ui_chat_message_add_raw(string(event.user)+" left the channel", "light");
+    util::add_message(event.target, "Part", event.user+" left the channel", (unsigned char[3]){100, 0, 0});
   }else if(payload["t"] == "smsg"){
     proto::smsg event = proto::smsg();
     event.load_json(payload);
 
     cout << "smsg: " << event.message << endl;
-    //TODO: ui_chat_message_add_raw("Server: "+string(event.message), "danger");
+    util::add_message("server", "Server", event.message, (unsigned char[3]){0, 0, 100});
   }else if(payload["t"] == "cmsg"){
     proto::cmsg event = proto::cmsg();
     event.load_json(payload);
 
     cout << "cmsg from '" << event.source << "': " << event.message << endl;
-    //TODO: ui_chat_message_add_raw(string(event.source)+": "+string(event.message), "light");
+    util::add_message(event.target, event.source, event.message);
   }else if(payload["t"] == "channellist"){
     proto::channellist event = proto::channellist();
     event.load_json(payload);

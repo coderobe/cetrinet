@@ -21,6 +21,23 @@ namespace util {
     return !isdigit(c);
   }
 
+  void add_message(string to, string from, string content){
+    unsigned char color[3] = {0, 0, 0};
+    add_message(to, from, content, color);
+  }
+
+  void add_message(string to, string from, string content, unsigned char color[3]){
+    proto::message* lmsg = new proto::message;
+    lmsg->to = to;
+    lmsg->from = from;
+    lmsg->content = content;
+    lmsg->rgb[0] = color[0];
+    lmsg->rgb[1] = color[1];
+    lmsg->rgb[2] = color[2];
+    server_messages.push_back(lmsg);
+    ui_update_chats();
+  }
+
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;
