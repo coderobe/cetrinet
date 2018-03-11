@@ -40,6 +40,10 @@ namespace util {
   }
 
   void send_message(string to, string content){
+    if(content.length() < 1){
+      return;
+    }
+
     proto::cmsg* msg = new proto::cmsg();
     msg->target = to;
     msg->message = content;
