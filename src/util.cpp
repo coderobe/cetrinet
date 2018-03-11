@@ -57,6 +57,7 @@ namespace util {
 
   void thread_start_ui(){
     cout << "Starting UI worker" << endl;
-    threads.push_back(new thread(ui_worker));
+    //threads.push_back(new thread(ui_worker));
+    ui_worker();
   }
 }
