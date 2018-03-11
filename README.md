@@ -2,9 +2,8 @@
 
 ## Dependencies
 - meson
-- clang
-- LCUI https://github.com/lc-soft/LCUI
-- lcui.css https://github.com/lc-ui/lcui.css
+- clang++ (with c++17 support)
+- TGUI https://github.com/texus/TGUI **(v 0.7)**
 - nlohmann/json https://github.com/nlohmann/json
 - Simple WebSocket Server https://github.com/eidheim/Simple-WebSocket-Server
 
@@ -17,6 +16,8 @@
 
 ### On macOS
 - Use something like `export PKG_CONFIG_PATH=/usr/local/Cellar/openssl/1.0.2n/lib/pkgconfig:vendor/pkgconfig`
+- Run `git clone https://github.com/eidheim/simple-websocket-server`
+- Extract `https://github.com/nlohmann/json/releases/download/v3.1.1/include.zip` into `vendor/include`
 - Build with meson
 
 ### With meson
