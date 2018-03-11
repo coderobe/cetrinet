@@ -5,21 +5,25 @@ project('cetrinet', 'cpp',
 )
 
 add_project_arguments(
-#  '-Os',
-#  '-ffast-math',
-#  '-fno-math-errno',
-#  '-fno-ident',
-#  '-ffunction-sections',
-#  '-fdata-sections',
-#  '-fmerge-all-constants',
+  '-march=x86-64',
+  '-mtune=generic',
+  '-pipe',
+  '-fno-plt',
+  '-Os',
+  '-ffast-math',
+  '-fno-math-errno',
+  '-fno-ident',
+  '-ffunction-sections',
+  '-fdata-sections',
+  '-fmerge-all-constants',
+  '-gsplit-dwarf',
   language: 'cpp',
 )
 
 add_project_link_arguments(
 #  '-static',
 #  '-Wl,-Bstatic', #TODO: proper static build
-#  '-s',
-#  '-Wl,--gc-sections',
+  '-Wl,--gc-sections',
   language: 'cpp',
 )
 
