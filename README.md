@@ -16,7 +16,7 @@
 
 ### On macOS
 - Use something like `export PKG_CONFIG_PATH=/usr/local/Cellar/openssl/1.0.2n/lib/pkgconfig:vendor/pkgconfig`
-- Run `git clone https://github.com/eidheim/simple-websocket-server`
+- Run `git clone https://github.com/eidheim/simple-websocket-server vendor/include/simple-websocket-server`
 - Extract `https://github.com/nlohmann/json/releases/download/v3.1.1/include.zip` into `vendor/include`
 - Build with meson
 
