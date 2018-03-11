@@ -27,4 +27,7 @@ extern sf::Color color_grey;
 extern sf::Color color_red;
 extern sf::Color color_green;
 extern sf::Color color_blue;
+
+extern void clean_up();
+
 #endif

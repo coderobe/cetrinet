@@ -41,13 +41,18 @@ void net_worker(){
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
       net_connection = connection;
-      username = username.substr(0, username.find("#"));
+
+      if(username.substr(0, username.find("#")).length() < 1){
+        return;
+      }
 
       util::add_message("server", "cetrinet", "connected to server", (unsigned char[3]){0, 100, 0});
 
       proto::auth auth = proto::auth();
       auth.name = username;
       net_send(json::to_msgpack(auth.encode()));
+
+      username = username.substr(0, username.find("#"));
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
@@ -79,6 +84,7 @@ void net_worker(){
       delete net_client;
       net_client = nullptr;
     }
+    clean_up();
   } else {
     net_client->stop();
     while(net_client != nullptr){

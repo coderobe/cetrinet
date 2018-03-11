@@ -27,6 +27,18 @@ sf::Color color_red = sf::Color(255, 0, 0, 255);
 sf::Color color_green = sf::Color(0, 255, 0, 255);
 sf::Color color_blue = sf::Color(0, 0, 255, 255);
 
+void clean_up(){
+  while(!channels.empty()){
+    delete channels.front();
+    channels.erase(channels.begin());
+  }
+
+  while(!server_messages.empty()){
+    delete server_messages.front();
+    server_messages.erase(server_messages.begin());
+  }
+}
+
 int main(){
   window.setFramerateLimit(60);
   window.setActive(false);
@@ -47,15 +59,7 @@ int main(){
     delete t;
   }
 
-  while(!channels.empty()){
-    delete channels.front();
-    channels.erase(channels.begin());
-  }
-
-  while(!server_messages.empty()){
-    delete server_messages.front();
-    server_messages.erase(server_messages.begin());
-  }
+  clean_up();
 
   cout << "Done" << endl;
   return 0;
