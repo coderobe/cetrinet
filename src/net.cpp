@@ -15,8 +15,19 @@ void net_send(vector<unsigned char> data){
   }
 }
 
+void net_disconnect(){
+  if(net_client != nullptr){
+    net_client->stop();
+  }
+  while(net_client != nullptr){
+    this_thread::sleep_for(chrono::milliseconds(10));
+  }
+}
+
 void net_worker(){
   if(net_client == nullptr){
+    clean_up();
+
     if(server.size() < 1){
       server = "localhost";
     }
@@ -84,7 +95,7 @@ void net_worker(){
       delete net_client;
       net_client = nullptr;
     }
-    clean_up();
+    ui_handle_disconnect();
   } else {
     net_client->stop();
     while(net_client != nullptr){

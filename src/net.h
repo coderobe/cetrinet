@@ -21,6 +21,7 @@
 #include "proto/userlist.h"
 
 void net_worker();
+void net_disconnect();
 void net_send(std::vector<unsigned char> data);
 
 #endif

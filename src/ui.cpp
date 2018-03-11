@@ -155,12 +155,18 @@ void onMenuSelected(tgui::Gui& gui, string menu){
       username = edit_username->getText();
       util::thread_start_net();
     });
+  }else if(menu == "Disconnect"){
+    net_disconnect();
   }else if(menu == "About"){
     auto msgbox = tgui::MessageBox::create();
     msgbox->setText("Hello, world!");
     gui.add(msgbox);
   }
   window.setActive(true);
+}
+
+void ui_handle_disconnect(){
+  util::add_message("server", "cetrinet", "Disconnected from server", (unsigned char[3]){100, 0, 0});  
 }
 
 void ui_worker(){
@@ -174,6 +180,7 @@ void ui_worker(){
     menubar->setSize(window.getSize().x, 20);
     menubar->addMenu("Connection");
     menubar->addMenuItem("Connect");
+    menubar->addMenuItem("Disconnect");
     menubar->addMenu("Help");
     menubar->addMenuItem("About");
     menubar->connect("MenuItemClicked", onMenuSelected, std::ref(gui));
