@@ -77,7 +77,11 @@ void onTabSelected(tgui::Gui& gui, string tab){
 
 void onChatSubmit(tgui::EditBox::Ptr input, string text){
   input->setText("");
-  util::send_message(ui_channel_current, text);
+  string nt = text;
+  nt.erase(remove_if(nt.begin(), nt.end(), ::isspace), nt.end());
+  if(nt.length() > 0){
+    util::send_message(ui_channel_current, text);
+  }
 }
 
 void onMenuSelected(tgui::Gui& gui, string menu){
