@@ -13,4 +13,5 @@ cpu = 'i686'
 endian = 'little'
 
 [properties]
-cxx_args = ['-DWINDOWS=1']
+cxx_args = ['-DWINDOWS=1', '-static-libgcc', '-static-libstdc++']
+ld_args = ['-static', '-mwindows']

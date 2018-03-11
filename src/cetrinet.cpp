@@ -19,6 +19,7 @@ std::vector<proto::channel*> channels;
 sf::RenderWindow window(sf::VideoMode(800, 700), "cetrinet");
 
 int main(){
+  window.setActive(false);
   cout << "Hello, cetrinet!" << endl;
 
   util::thread_start_ui();
