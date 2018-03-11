@@ -38,5 +38,6 @@ exe = executable(
   'cetrinet',
   sources: sources,
   dependencies: dependencies,
+  include_directories: include_directories('vendor/include'),
   gui_app: true,
 )
