@@ -15,6 +15,10 @@
 
 ## Build
 
+### On macOS
+- Use something like `export PKG_CONFIG_PATH=/usr/local/Cellar/openssl/1.0.2n/lib/pkgconfig:vendor/pkgconfig`
+- Build with meson
+
 ### With meson
 - `CXX=clang++ meson . build`
 - `cd build`
