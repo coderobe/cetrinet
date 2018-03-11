@@ -75,8 +75,10 @@ void net_worker(){
     };
 
     net_client->start();
-    delete net_client;
-    net_client = nullptr;
+    if(net_client != nullptr){
+      delete net_client;
+      net_client = nullptr;
+    }
   } else {
     net_client->stop();
     while(net_client != nullptr){
