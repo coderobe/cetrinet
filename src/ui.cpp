@@ -50,6 +50,7 @@ void ui_worker(){
 
   sf::Color color_white = sf::Color(255, 255, 255, 255);
   sf::Color color_black = sf::Color(0, 0, 0, 255);
+  sf::Color color_grey = sf::Color(200, 200, 200, 255);
   sf::Color color_red = sf::Color(255, 0, 0, 255);
   sf::Color color_green = sf::Color(0, 255, 0, 255);
   sf::Color color_blue = sf::Color(0, 0, 255, 255);
@@ -120,7 +121,7 @@ void ui_worker(){
     auto game_field_main_hold = tgui::Panel::create();
 
     game_field_main_hold->setBackgroundColor(color_black);
-    game_field_main_hold->setSize(game_secondary_tile_size*game_field_main_box_tiles+border_weight*(game_field_main_box_tiles+2), bindHeight(game_field_main));
+    game_field_main_hold->setSize(game_secondary_tile_size*game_field_main_box_tiles+border_weight*(game_field_main_box_tiles+3), bindHeight(game_field_main));
     game_field_main_hold->setPosition(0, 0);
     panel_channel->add(game_field_main_hold, "game_field_main_hold");
 
@@ -138,7 +139,7 @@ void ui_worker(){
 
     for(size_t i = 0; i < 6; i++){
       auto hold_box = tgui::Panel::create();
-      hold_box->setBackgroundColor(color_white);
+      hold_box->setBackgroundColor(color_grey);
       hold_box->setSize(
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles,
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles
@@ -156,6 +157,19 @@ void ui_worker(){
         l_height += border_weight;
       }
       hold_box->setPosition(border_weight, l_height);
+
+      for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
+        for(size_t l_y = 0; l_y < game_field_main_box_tiles; l_y++){
+          auto game_field_hold_tile = tgui::Panel::create();
+          game_field_hold_tile->setBackgroundColor(color_white);
+          game_field_hold_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
+          game_field_hold_tile->setPosition(
+            border_weight+(border_weight+game_secondary_tile_size)*l_x,
+            (border_weight+game_secondary_tile_size)*l_y
+          );
+          hold_box->add(game_field_hold_tile);
+        }
+      }
       game_field_main_hold->add(hold_box, "hold_box_"+to_string(i));
     }
 
@@ -175,21 +189,78 @@ void ui_worker(){
     game_field_main_label->setTextSize(font_size);
     game_field_main_label_box->add(game_field_main_label);
 
+    auto game_field_main_box = tgui::Panel::create();
+    game_field_main_box->setBackgroundColor(color_grey);
+    game_field_main_box->setSize(
+      bindWidth(game_field_main)-border_weight*2,
+      bindHeight(game_field_main)-bindHeight(game_field_main_label_box)-border_weight*2
+    );
+    game_field_main_box->setPosition(border_weight, border_weight+bindHeight(game_field_main_label_box));
+    game_field_main->add(game_field_main_box);
+
     for(size_t x = 0; x < game_row_w; x++){
       for(size_t y = 0; y < game_row_h; y++){
         auto game_field_main_tile = tgui::Panel::create();
         game_field_main_tile->setBackgroundColor(color_white);
         game_field_main_tile->setSize(game_tile_size, game_tile_size);
-        game_field_main_tile->setPosition(border_weight+(border_weight+game_tile_size)*x, (border_weight+game_tile_size)*(y+1));
-        game_field_main->add(game_field_main_tile);
+        game_field_main_tile->setPosition(border_weight+(border_weight+game_tile_size)*x, border_weight+(border_weight+game_tile_size)*y);
+        game_field_main_box->add(game_field_main_tile);
       }
     }
 
     auto game_field_main_preview = tgui::Panel::create();
-    game_field_main_preview->setBackgroundColor(color_red);
+    game_field_main_preview->setBackgroundColor(color_black);
     game_field_main_preview->setSize(game_secondary_tile_size*game_field_main_box_tiles+border_weight*(game_field_main_box_tiles+2), bindHeight(game_field_main));
     game_field_main_preview->setPosition(bindRight(game_field_main)+padding, 0);
     panel_channel->add(game_field_main_preview, "game_field_main_preview");
+
+    auto game_field_main_preview_label_box = tgui::Panel::create();
+    game_field_main_preview_label_box->setBackgroundColor(color_white);
+    game_field_main_preview_label_box->setSize(bindWidth(game_field_main_preview)-border_weight*2, bindHeight(game_field_main_label_box));
+    game_field_main_preview_label_box->setPosition(border_weight, border_weight);
+    game_field_main_preview->add(game_field_main_preview_label_box);
+
+    auto game_field_main_preview_label = tgui::Label::create();
+    game_field_main_preview_label->setText("Next Up");
+    game_field_main_preview_label->setPosition(border_weight, border_weight);
+    game_field_main_preview_label->setTextSize(font_size);
+    game_field_main_preview_label_box->add(game_field_main_preview_label);
+
+    for(size_t i = 0; i < 6; i++){
+      auto hold_box = tgui::Panel::create();
+      hold_box->setBackgroundColor(color_grey);
+      hold_box->setSize(
+        game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles,
+        game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles
+      );
+      tgui::Layout l_height = border_weight+bindHeight(game_field_main_label_box);
+      tgui::Layout l_offset = ((bindHeight(game_field_main_preview)-l_height)/6.0f)-bindHeight(hold_box)-(padding/7.0f);
+      if(i > 0){
+        size_t l_i = i;
+        while(l_i > 0){
+          l_height += bindHeight(game_field_main_preview->get("preview_box_"+to_string(l_i-1)))+l_offset;
+          l_i--;
+        }
+      }
+      if(i < 6){
+        l_height += border_weight;
+      }
+      hold_box->setPosition(border_weight, l_height);
+
+      for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
+        for(size_t l_y = 0; l_y < game_field_main_box_tiles; l_y++){
+          auto game_field_hold_tile = tgui::Panel::create();
+          game_field_hold_tile->setBackgroundColor(color_white);
+          game_field_hold_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
+          game_field_hold_tile->setPosition(
+            border_weight+(border_weight+game_secondary_tile_size)*l_x,
+            (border_weight+game_secondary_tile_size)*l_y
+          );
+          hold_box->add(game_field_hold_tile);
+        }
+      }
+      game_field_main_preview->add(hold_box, "preview_box_"+to_string(i));
+    }
 
     auto game_field_secondary = tgui::Panel::create();
     game_field_secondary->setBackgroundColor(color_blue);
