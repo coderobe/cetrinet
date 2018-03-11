@@ -19,6 +19,7 @@ namespace util{
   void thread_start_ui();
   void add_message(std::string to, std::string from, std::string content);
   void add_message(std::string to, std::string from, std::string content, unsigned char color[3]);
+  void send_message(std::string to, std::string content);
   bool is_not_digit(char c);
 };
 

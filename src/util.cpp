@@ -1,6 +1,7 @@
 #include "util.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 namespace util {
   atomic<bool> stdout_silenced = false;
@@ -36,6 +37,14 @@ namespace util {
     lmsg->rgb[2] = color[2];
     server_messages.push_back(lmsg);
     ui_update_chats();
+  }
+
+  void send_message(string to, string content){
+    proto::cmsg* msg = new proto::cmsg();
+    msg->target = to;
+    msg->message = content;
+    net_send(json::to_msgpack(msg->encode()));
+    delete msg;
   }
 
   void stdout_unsilence(){

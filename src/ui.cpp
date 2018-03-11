@@ -75,6 +75,11 @@ void onTabSelected(tgui::Gui& gui, string tab){
   }
 }
 
+void onChatSubmit(tgui::EditBox::Ptr input, string text){
+  input->setText("");
+  util::send_message(ui_channel_current, text);
+}
+
 void onMenuSelected(tgui::Gui& gui, string menu){
   cout << menu << endl;
   if(menu == "Connect"){
@@ -192,12 +197,13 @@ void ui_worker(){
     ui_gui_set_font(panel_server_chat, "monospace");
     panel_server->add(panel_server_chat, "panel_server_chat");
     auto panel_server_chat_input = tgui::EditBox::create();
+    panel_server->add(panel_server_chat_input);
+    panel_server_chat_input->connect("ReturnKeyPressed", onChatSubmit, panel_server_chat_input);
     panel_server_chat_input->setSize(panel_server->getSize().x, panel_server->getSize().y*0.04);
     panel_server_chat_input->setPosition(0, panel_server_chat->getSize().y);
     panel_server_chat_input->setTextSize(font_size);
     panel_server_chat_input->setDefaultText("Enter message...");
     ui_gui_set_font(panel_server_chat_input, "monospace");
-    panel_server->add(panel_server_chat_input);
 
     //TODO: remove
     panel_server_chat->addLine("Welcome to cetrinet");
@@ -388,12 +394,13 @@ void ui_worker(){
     panel_channel_chat_box->add(panel_channel_chat, "panel_channel_chat");
    
     auto panel_channel_chat_input = tgui::EditBox::create();
+    panel_channel_chat_box->add(panel_channel_chat_input);
+    panel_channel_chat_input->connect("ReturnKeyPressed", onChatSubmit, panel_channel_chat_input);
     panel_channel_chat_input->setSize(bindWidth(panel_channel_chat_box), bindHeight(panel_channel_chat_box)*0.15);
     panel_channel_chat_input->setPosition(0, bindBottom(panel_channel_chat));
     panel_channel_chat_input->setTextSize(font_size);
     panel_channel_chat_input->setDefaultText("Enter message...");
     ui_gui_set_font(panel_channel_chat_input, "monospace");
-    panel_channel_chat_box->add(panel_channel_chat_input);
 
     menubar->moveToFront();
 
