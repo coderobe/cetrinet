@@ -24,6 +24,7 @@
 void ui_worker();
 void ui_update_chats();
 void ui_update_channels();
+void ui_update_users();
 void ui_handle_disconnect();
 bool ui_running();
 

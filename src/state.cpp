@@ -35,13 +35,28 @@ void state_update(json payload){
     }
     cout << "user '" << event.user << "' joined channel " << event.target << endl;
     util::add_message(event.target, "Join", event.user+" joined the channel", (unsigned char[3]){0, 0, 100});
-    //TODO: ui_update_users_state();
+    ui_update_users();
   }else if(payload["t"] == "part"){
     proto::part event = proto::part();
     event.load_json(payload);
 
+    for(proto::channel* chan : channels){
+      if(chan->name == event.target){
+        if(event.user == username){
+          chan->joined = false;
+        }else{
+          for(auto user : chan->userdata){
+            if(user->name == event.user){
+              chan->userdata.erase(remove(chan->userdata.begin(), chan->userdata.end(), user), chan->userdata.end());
+            }
+          }
+        }
+        ui_update_channels();
+      }
+    }
     cout << "user '" << event.user << "' parted from " << event.target << endl;
     util::add_message(event.target, "Part", event.user+" left the channel", (unsigned char[3]){100, 0, 0});
+    ui_update_users();
   }else if(payload["t"] == "smsg"){
     proto::smsg event = proto::smsg();
     event.load_json(payload);
@@ -67,7 +82,7 @@ void state_update(json payload){
       channel->joined = chan->joined;
       channels.push_back(channel);
     }
-    //TODO: ui_update_channel_state();
+    ui_update_channels();
   }else if(payload["t"] == "userlist"){
     proto::userlist event = proto::userlist();
     event.load_json(payload);
@@ -85,7 +100,7 @@ void state_update(json payload){
         chan->userdata.swap(new_users);
       }
     }
-    //TODO: ui_update_users_state();
+    ui_update_users();
   }else if(payload["t"] == "gtick"){
     proto::gtick event = proto::gtick();
     event.load_json(payload);

@@ -64,6 +64,19 @@ void ui_update_channels(){
   }
 }
 
+void ui_update_users(){
+  tgui::ListBox::Ptr list = static_pointer_cast<tgui::ListBox>(gui.get("panel_channel_users", true));
+
+  for(auto chan : channels){
+    if(chan->name == ui_channel_current){
+      list->removeAllItems();
+      for(auto user : chan->userdata){
+        list->addItem(user->name, user->name);
+      }
+    }
+  }
+}
+
 void onTabSelected(tgui::Gui& gui, string tab){
   ui_channel_current = tab;
   if(tab == "Server"){
@@ -72,6 +85,7 @@ void onTabSelected(tgui::Gui& gui, string tab){
   }else{
     gui.get("panel_server")->hide();
     gui.get("panel_channel")->show();
+    ui_update_users();
   }
 }
 
@@ -385,8 +399,13 @@ void ui_worker(){
       game_field_player_secondary->setBackgroundColor(color_red);
     }
 
+    auto panel_channel_users = tgui::ListBox::create();
+    panel_channel_users->setSize(bindWidth(panel_channel)*0.2, bindHeight(panel_channel)-bindHeight(game_field_main));
+    panel_channel_users->setPosition(bindRight(panel_channel)-bindWidth(panel_channel_users), bindBottom(game_field_main)+border_weight+padding);
+    panel_channel->add(panel_channel_users, "panel_channel_users");
+
     auto panel_channel_chat_box = tgui::Panel::create();
-    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main));
+    panel_channel_chat_box->setSize(bindWidth(panel_channel)-bindWidth(panel_channel_users), bindHeight(panel_channel)-bindHeight(game_field_main));
     panel_channel_chat_box->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
     panel_channel->add(panel_channel_chat_box);
     
