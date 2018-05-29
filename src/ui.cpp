@@ -202,21 +202,12 @@ void ui_worker(){
     gui.add(panel_server, "panel_server");
 
     auto panel_server_chat = tgui::ChatBox::create();
-    panel_server_chat->setSize(panel_server->getSize().x, panel_server->getSize().y*0.96);
+    panel_server_chat->setSize(panel_server->getSize().x, panel_server->getSize().y);
     panel_server_chat->setPosition(0, 0);
     panel_server_chat->setTextSize(font_size);
     ui_gui_set_font(panel_server_chat, "monospace");
     panel_server->add(panel_server_chat, "panel_server_chat");
-    auto panel_server_chat_input = tgui::EditBox::create();
-    panel_server->add(panel_server_chat_input);
-    panel_server_chat_input->connect("ReturnKeyPressed", onChatSubmit, panel_server_chat_input);
-    panel_server_chat_input->setSize(panel_server->getSize().x, panel_server->getSize().y*0.04);
-    panel_server_chat_input->setPosition(0, panel_server_chat->getSize().y);
-    panel_server_chat_input->setTextSize(font_size);
-    panel_server_chat_input->setDefaultText("Enter message...");
-    ui_gui_set_font(panel_server_chat_input, "monospace");
 
-    //TODO: remove
     panel_server_chat->addLine("Welcome to cetrinet");
 
     //TODO: dynamic creation
