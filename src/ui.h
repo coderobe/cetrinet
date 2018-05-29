@@ -16,8 +16,10 @@
 #include "proto/cmsg.h"
 
 // Fuck windows, honestly
+#ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #undef MessageBox
+#endif
 
 void ui_worker();
 void ui_update_chats();
