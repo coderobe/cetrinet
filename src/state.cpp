@@ -86,5 +86,12 @@ void state_update(json payload){
       }
     }
     //TODO: ui_update_users_state();
+  }else if(payload["t"] == "gtick"){
+    proto::gtick event = proto::gtick();
+    event.load_json(payload);
+
+    cout << "server tick" << endl;
+
+    //TODO: hook up to game logic
   }
 }
