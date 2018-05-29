@@ -412,6 +412,8 @@ void ui_worker(){
     cerr << "TGUI Exception: " << e.what() << endl;
   }
 
+  onMenuSelected(gui, "Connect");
+
   while(window.isOpen()){
     sf::Event event;
     while(window.pollEvent(event)){
