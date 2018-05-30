@@ -18,7 +18,7 @@ std::string port;
 std::string username;
 std::vector<proto::channel*> channels;
 std::vector<proto::message*> server_messages;
-sf::RenderWindow window(sf::VideoMode(940, 700), "cetrinet");
+sf::RenderWindow window(sf::VideoMode(948, 720), "cetrinet");
 tgui::Gui gui(window);
 sf::Color color_white = sf::Color(255, 255, 255, 255);
 sf::Color color_black = sf::Color(0, 0, 0, 255);
