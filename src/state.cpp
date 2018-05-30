@@ -96,8 +96,11 @@ void state_update(json payload){
           nu->name = eu->name;
           new_users.push_back(nu);
         }
-        //TODO: clean up new_users to prevent leaking memory?
+
         chan->userdata.swap(new_users);
+        for(proto::user* user : new_users){
+          delete user;
+        }
       }
     }
     ui_update_users();
