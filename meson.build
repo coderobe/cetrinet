@@ -4,26 +4,40 @@ project('cetrinet', 'cpp',
   ],
 )
 
-add_project_arguments(
-  '-march=x86-64',
-  '-mtune=generic',
-  '-pipe',
-  '-fno-plt',
-  '-Os',
-  '-ffast-math',
-  '-fno-math-errno',
-  '-fno-ident',
-  '-ffunction-sections',
-  '-fdata-sections',
-  '-fmerge-all-constants',
-  '-gsplit-dwarf',
-  language: 'cpp',
-)
+if get_option('buildtype').startswith('debug')
+  add_project_arguments(
+    '-Og',
+    '-g',
+    '-fsanitize=address',
+    '-fno-omit-frame-pointer',
+    language: 'cpp',
+  )
+  add_project_link_arguments(
+    '-fsanitize=address',
+    language: 'cpp',
+  )
+else
+  add_project_arguments(
+    '-march=x86-64',
+    '-mtune=generic',
+    '-pipe',
+    '-fno-plt',
+    '-Os',
+    '-ffast-math',
+    '-fno-math-errno',
+    '-fno-ident',
+    '-ffunction-sections',
+    '-fdata-sections',
+    '-fmerge-all-constants',
+    '-gsplit-dwarf',
+    language: 'cpp',
+  )
+endif
 
 add_project_link_arguments(
 #  '-static',
 #  '-Wl,-Bstatic', #TODO: proper static build
-  '-Wl,--gc-sections',
+#  '-Wl,--gc-sections', #incompatible on macOS
   language: 'cpp',
 )
 

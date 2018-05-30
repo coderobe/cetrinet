@@ -1,0 +1,8 @@
+leak:lib/dri
+leak:libfontconfig
+leak:libharfbuzz
+leak:libtgui
+leak:libsfml
+leak:libfreetype
+leak:sf::Font
+leak:include/TGUI
