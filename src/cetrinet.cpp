@@ -29,6 +29,9 @@ sf::Color color_blue = sf::Color(0, 0, 255, 255);
 
 void clean_up(){
   while(!channels.empty()){
+    for(auto user : channels.front()->userdata){
+      delete user;
+    }
     delete channels.front();
     channels.erase(channels.begin());
   }
