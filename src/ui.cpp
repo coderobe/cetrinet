@@ -437,13 +437,14 @@ void ui_worker(){
     }
 
     auto panel_channel_chat_box = tgui::Panel::create();
-    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main));
+    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main)-padding*1.5);
     panel_channel_chat_box->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
+    panel_channel_chat_box->setBackgroundColor(color_black);
     panel_channel->add(panel_channel_chat_box);
     
     auto panel_channel_chat = tgui::ChatBox::create();
     panel_channel_chat->setSize(bindWidth(panel_channel_chat_box)*0.8, bindHeight(panel_channel_chat_box)*0.85);
-    panel_channel_chat->setPosition(0, 0);
+    panel_channel_chat->setPosition(border_weight, border_weight);
     panel_channel_chat->setTextSize(font_size);
     ui_gui_set_font(panel_channel_chat, "monospace");
     panel_channel_chat_box->add(panel_channel_chat, "panel_channel_chat");
@@ -452,14 +453,15 @@ void ui_worker(){
     panel_channel_chat_box->add(panel_channel_chat_input);
     panel_channel_chat_input->connect("ReturnKeyPressed", onChatSubmit, panel_channel_chat_input);
     panel_channel_chat_input->setSize(bindWidth(panel_channel_chat), bindHeight(panel_channel_chat_box)*0.15);
-    panel_channel_chat_input->setPosition(0, bindBottom(panel_channel_chat));
+    panel_channel_chat_input->setPosition(bindLeft(panel_channel_chat), bindBottom(panel_channel_chat)-border_weight);
     panel_channel_chat_input->setTextSize(font_size);
     panel_channel_chat_input->setDefaultText("Enter message...");
+    panel_channel_chat_input->setSize(panel_channel_chat_input->getSize().x, panel_channel_chat_input->getSize().y-border_weight);
     ui_gui_set_font(panel_channel_chat_input, "monospace");
 
     auto panel_channel_users = tgui::ListBox::create();
-    panel_channel_users->setSize(bindWidth(panel_channel_chat_box)*0.2, bindHeight(panel_channel_chat_box));
-    panel_channel_users->setPosition(bindRight(panel_channel_chat), 0);
+    panel_channel_users->setSize(bindWidth(panel_channel_chat_box)*0.2-border_weight*2, bindHeight(panel_channel_chat_box)-border_weight*2);
+    panel_channel_users->setPosition(bindRight(panel_channel_chat), bindTop(panel_channel_chat));
     panel_channel_chat_box->add(panel_channel_users, "panel_channel_users");
 
     menubar->moveToFront();
