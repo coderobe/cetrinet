@@ -389,28 +389,60 @@ void ui_worker(){
     }
 
     auto game_field_secondary = tgui::Panel::create();
-    game_field_secondary->setBackgroundColor(color_grey);
-    game_field_secondary->setSize((game_row_w*game_secondary_tile_size+border_weight*(game_row_w+1))*4, (game_row_h*game_secondary_tile_size+border_weight*game_row_h)*2+1);
+    game_field_secondary->setBackgroundColor(color_black);
+    game_field_secondary->setSize((game_row_w*game_secondary_tile_size+border_weight*(game_row_w+2))*4+border_weight, (game_row_h*game_secondary_tile_size+border_weight*(game_row_h+1))*2+1);
     game_field_secondary->setPosition(bindRight(game_field_main_preview)+padding, 0);
     panel_channel->add(game_field_secondary, "game_field_secondary");
 
     for(size_t player_id = 2; player_id <= 9; player_id++){
       auto game_field_player_secondary = tgui::Panel::create();
-      game_field_player_secondary->setBackgroundColor(color_red);
+      game_field_player_secondary->setBackgroundColor(color_grey);
+
+      tgui::Panel::Ptr previous_panel = static_pointer_cast<tgui::Panel>(gui.get("game_field_player_"+to_string(player_id-1), true));
+
+      tgui::Layout posh, posv;
+      if(player_id == 2){
+        posh = border_weight;
+        posv = border_weight;
+      }else if(player_id % 2){
+        posh = bindLeft(previous_panel);
+        posv = bindBottom(previous_panel)+border_weight;
+      } else {
+        posh = bindRight(previous_panel)+border_weight;
+        posv = border_weight;
+      }
+
+      game_field_player_secondary->setPosition(posh, posv);
+      game_field_player_secondary->setSize(game_row_w*game_secondary_tile_size+border_weight*(game_row_w+1), game_row_h*game_secondary_tile_size+border_weight*game_row_h);
+
+      for(size_t x = 0; x < game_row_w; x++){
+        for(size_t y = 0; y < game_row_h; y++){
+          auto game_field_secondary_tile = tgui::Panel::create();
+          game_field_secondary_tile->setBackgroundColor(color_white);
+          game_field_secondary_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
+          game_field_secondary_tile->setPosition(border_weight+(border_weight+game_secondary_tile_size)*x, border_weight+(border_weight+game_secondary_tile_size)*y);
+          game_field_player_secondary->add(game_field_secondary_tile);
+        }
+      }
+
+      auto game_field_secondary_label = tgui::Label::create();
+      game_field_secondary_label->setText("No Player");
+      game_field_secondary_label->setPosition((bindWidth(game_field_player_secondary)/2)-(bindWidth(game_field_secondary_label)/2),
+        (bindHeight(game_field_player_secondary)/2)-(bindHeight(game_field_secondary_label)/2));
+      game_field_secondary_label->setTextSize(font_size*1.8);
+      game_field_secondary_label->setOpacity(0.8);
+      game_field_player_secondary->add(game_field_secondary_label, "game_field_player_label_"+to_string(player_id));
+
+      game_field_secondary->add(game_field_player_secondary, "game_field_player_"+to_string(player_id));
     }
 
-    auto panel_channel_users = tgui::ListBox::create();
-    panel_channel_users->setSize(bindWidth(panel_channel)*0.2, bindHeight(panel_channel)-bindHeight(game_field_main));
-    panel_channel_users->setPosition(bindRight(panel_channel)-bindWidth(panel_channel_users), bindBottom(game_field_main)+border_weight+padding);
-    panel_channel->add(panel_channel_users, "panel_channel_users");
-
     auto panel_channel_chat_box = tgui::Panel::create();
-    panel_channel_chat_box->setSize(bindWidth(panel_channel)-bindWidth(panel_channel_users), bindHeight(panel_channel)-bindHeight(game_field_main));
+    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main));
     panel_channel_chat_box->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
     panel_channel->add(panel_channel_chat_box);
     
     auto panel_channel_chat = tgui::ChatBox::create();
-    panel_channel_chat->setSize(bindWidth(panel_channel_chat_box), bindHeight(panel_channel_chat_box)*0.85);
+    panel_channel_chat->setSize(bindWidth(panel_channel_chat_box)*0.8, bindHeight(panel_channel_chat_box)*0.85);
     panel_channel_chat->setPosition(0, 0);
     panel_channel_chat->setTextSize(font_size);
     ui_gui_set_font(panel_channel_chat, "monospace");
@@ -419,11 +451,16 @@ void ui_worker(){
     auto panel_channel_chat_input = tgui::EditBox::create();
     panel_channel_chat_box->add(panel_channel_chat_input);
     panel_channel_chat_input->connect("ReturnKeyPressed", onChatSubmit, panel_channel_chat_input);
-    panel_channel_chat_input->setSize(bindWidth(panel_channel_chat_box), bindHeight(panel_channel_chat_box)*0.15);
+    panel_channel_chat_input->setSize(bindWidth(panel_channel_chat), bindHeight(panel_channel_chat_box)*0.15);
     panel_channel_chat_input->setPosition(0, bindBottom(panel_channel_chat));
     panel_channel_chat_input->setTextSize(font_size);
     panel_channel_chat_input->setDefaultText("Enter message...");
     ui_gui_set_font(panel_channel_chat_input, "monospace");
+
+    auto panel_channel_users = tgui::ListBox::create();
+    panel_channel_users->setSize(bindWidth(panel_channel_chat_box)*0.2, bindHeight(panel_channel_chat_box));
+    panel_channel_users->setPosition(bindRight(panel_channel_chat), 0);
+    panel_channel_chat_box->add(panel_channel_users, "panel_channel_users");
 
     menubar->moveToFront();
 
