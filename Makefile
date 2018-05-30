@@ -34,4 +34,4 @@ winbuild/build.ninja:
 	meson --buildtype ${BUILDTYPE} --cross-file windows.xcc . winbuild
 
 run: ${TARGET}
-	LSAN_OPTIONS=suppressions=asan/lsan.supp ASAN_OPTIONS=suppressions=asan/asan.supp ${TARGET}
+	LSAN_OPTIONS=suppressions=asan/lsan.supp ASAN_OPTIONS=suppressions=asan/asan.supp:detect_leaks=1 ${TARGET}
