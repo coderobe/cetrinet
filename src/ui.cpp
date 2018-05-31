@@ -3,6 +3,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+atomic<bool> ui_needs_redraw = true;
+
 string ui_get_font_path(const char* name){
   FcConfig* config = FcInitLoadConfigAndFonts();
   FcPattern* pattern = FcNameParse((const FcChar8*)name);
@@ -50,6 +52,7 @@ void ui_update_chats(){
       chat_channel->addLine(msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
     }
   }
+  ui_needs_redraw = true;
 }
 
 void ui_update_channels(){
@@ -62,6 +65,7 @@ void ui_update_channels(){
       tabs->add(chan->name);
     }
   }
+  ui_needs_redraw = true;
 }
 
 void ui_update_users(){
@@ -75,6 +79,7 @@ void ui_update_users(){
       }
     }
   }
+  ui_needs_redraw = true;
 }
 
 void onTabSelected(tgui::Gui& gui, string tab){
@@ -512,9 +517,15 @@ void ui_worker(){
 
   onMenuSelected(gui, "Connect");
 
-  while(window.isOpen()){
+
+  const sf::Time TimePerFrame = sf::seconds(1.f/60.f);
+  ui_needs_redraw = true;
+
+  while(ui_running()){
     sf::Event event;
+    bool ui_has_drawn = false;
     while(window.pollEvent(event)){
+      ui_needs_redraw = true;
       if(event.type == sf::Event::Closed){
         window.close();
       }/*else if (event.type == sf::Event::Resized){
@@ -523,8 +534,15 @@ void ui_worker(){
       }*/ // Window resizing instead of scaling
       gui.handleEvent(event);
     }
-    window.clear(color_white);
-    gui.draw();
-    window.display();
+    if(ui_needs_redraw){
+      ui_has_drawn = true;
+      window.clear(color_white);
+      gui.draw();
+      window.display();
+      ui_needs_redraw = false;
+    }
+    if(!ui_has_drawn){
+      sf::sleep(TimePerFrame);
+    }
   }
 }
