@@ -88,8 +88,11 @@ void state_update(json payload){
     event.load_json(payload);
 
     cout << "userlist for channel " << event.channel << " reports " << event.users.size() << " users" << endl;
+    bool found = false;
     for(proto::channel* chan : channels){
       if(chan->name == event.channel){
+        found = true;
+
         vector<proto::user*> new_users;
         for(proto::user* eu : event.users){
           proto::user* nu = new proto::user;
@@ -102,6 +105,22 @@ void state_update(json payload){
           delete user;
         }
       }
+    }
+    if(!found){
+      cout << "userlist-discovered channel " << event.channel << endl;
+
+      vector<proto::user*> new_users;
+      for(proto::user* eu : event.users){
+        proto::user* nu = new proto::user;
+        nu->name = eu->name;
+        new_users.push_back(nu);
+      }
+
+      proto::channel* channel = new proto::channel;
+      channel->name = event.channel;
+      channel->userdata = new_users;
+      channel->joined = false;
+      channels.push_back(channel);
     }
     ui_update_users();
   }else if(payload["t"] == "gtick"){
