@@ -174,7 +174,6 @@ void onMenuSelected(tgui::Gui& gui, string menu){
   }else if(menu == "About"){
     auto msgbox = tgui::MessageBox::create();
     msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
-    vector<string> aboutdialog;
     msgbox->setText("cetrinet by coderobe\n2018\nhttps://coderobe.net");
     gui.add(msgbox);
   }
