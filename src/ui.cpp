@@ -78,14 +78,17 @@ void ui_update_users(){
 }
 
 void onTabSelected(tgui::Gui& gui, string tab){
-  ui_channel_current = tab;
-  if(tab == "Server"){
-    gui.get("panel_server")->show();
-    gui.get("panel_channel")->hide();
-  }else{
-    gui.get("panel_server")->hide();
-    gui.get("panel_channel")->show();
-    ui_update_users();
+  if(ui_channel_current != tab){
+    ui_channel_current = tab;
+    if(tab == "Server"){
+      gui.get("panel_server")->show();
+      gui.get("panel_channel")->hide();
+    }else{
+      gui.get("panel_server")->hide();
+      gui.get("panel_channel")->show();
+      ui_update_users();
+      ui_update_chats();
+    }
   }
 }
 
