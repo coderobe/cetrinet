@@ -174,6 +174,42 @@ void onMenuSelected(tgui::Gui& gui, string menu){
     });
   }else if(menu == "Disconnect"){
     net_disconnect();
+  }else if(menu == "Join Channel"){
+    auto msgbox = tgui::MessageBox::create();
+    gui.add(msgbox);
+    msgbox->setSize({200, 90});
+    msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
+
+    auto content = tgui::Panel::create();
+    msgbox->add(content);
+    content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+    content->setBackgroundColor(color_white);
+
+    auto label_channame = tgui::Label::create();
+    label_channame->setPosition(8, 8);
+    label_channame->setTextSize(14);
+    label_channame->setText("Channel Name");
+    content->add(label_channame);
+
+    auto edit_channel = tgui::EditBox::create();
+    edit_channel->setPosition(bindLeft(label_channame), bindBottom(label_channame));
+    edit_channel->setTextSize(14);
+    edit_channel->setSize(bindWidth(content)-8*2, bindHeight(label_channame));
+    edit_channel->setDefaultText("#lobby");
+    content->add(edit_channel);
+
+    auto button_join = tgui::Button::create();
+    content->add(button_join);
+    button_join->setPosition(8, bindBottom(edit_channel)+8*2);
+    button_join->setTextSize(14);
+    button_join->setSize(bindWidth(content)-8*2, bindHeight(edit_channel));
+    button_join->setText("Join");
+    button_join->connect("pressed", [=](){
+      msgbox->getParent()->remove(msgbox);
+      util::join_channel(edit_channel->getText());
+    });
+  }else if(menu == "Leave Channel"){
+
   }else if(menu == "About"){
     auto msgbox = tgui::MessageBox::create();
     msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
@@ -199,6 +235,9 @@ void ui_worker(){
     menubar->addMenu("Connection");
     menubar->addMenuItem("Connect");
     menubar->addMenuItem("Disconnect");
+    menubar->addMenu("Channels");
+    menubar->addMenuItem("Join Channel");
+    menubar->addMenuItem("Leave Channel");
     menubar->addMenu("Help");
     menubar->addMenuItem("About");
     menubar->connect("MenuItemClicked", onMenuSelected, std::ref(gui));
