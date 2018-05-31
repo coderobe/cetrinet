@@ -62,7 +62,10 @@ void state_update(json payload){
     event.load_json(payload);
 
     cout << "smsg: " << event.message << endl;
-    util::add_message("server", "Server", event.message, (unsigned char[3]){0, 0, 100});
+    if(event.target.size() == 0){
+      event.target = "server";
+    }
+    util::add_message(event.target, "Server", event.message, (unsigned char[3]){0, 0, 100});
   }else if(payload["t"] == "cmsg"){
     proto::cmsg event = proto::cmsg();
     event.load_json(payload);

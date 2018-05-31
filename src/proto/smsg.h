@@ -12,6 +12,7 @@ namespace proto {
     typedef msg super;
   public:
     smsg();
+    std::string target;
     void populate();
     void load_json(nlohmann::json payload);
     nlohmann::json encode();

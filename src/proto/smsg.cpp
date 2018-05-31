@@ -11,14 +11,19 @@ namespace proto {
     super::populate();
 
     type = "smsg";
+    target = "";
   }
   
   void smsg::load_json(json payload){
     super::load_json(payload);
+
+    target = payload["d"].value("t", "");
   }
 
   json smsg::encode(){
     json payload = super::encode();
+
+    payload["d"]["t"] = target;
 
     return payload;
   }
