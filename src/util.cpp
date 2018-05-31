@@ -47,6 +47,13 @@ namespace util {
     delete msg;
   }
 
+  void join_channel(string channel){
+    proto::join* msg = new proto::join();
+    msg->target = channel;
+    net_send(json::to_msgpack(msg->encode()));
+    delete msg;
+  }
+
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;
