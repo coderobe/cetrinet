@@ -517,7 +517,10 @@ void ui_worker(){
     while(window.pollEvent(event)){
       if(event.type == sf::Event::Closed){
         window.close();
-      }
+      }/*else if (event.type == sf::Event::Resized){
+        window.setView(sf::View(sf::FloatRect(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height))));
+        gui.setView(window.getView());
+      }*/ // Window resizing instead of scaling
       gui.handleEvent(event);
     }
     window.clear(color_white);
