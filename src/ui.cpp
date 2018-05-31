@@ -226,7 +226,6 @@ void ui_worker(){
 
     panel_server_chat->addLine("Welcome to cetrinet");
 
-    //TODO: dynamic creation
     auto panel_channel = tgui::Panel::create();
     panel_channel->setBackgroundColor(color_white);
     panel_channel->setSize(window.getSize().x-(padding*2), window.getSize().y-panel_offset-padding);
