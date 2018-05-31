@@ -44,6 +44,7 @@ void clean_up(){
 
 int main(){
   window.setFramerateLimit(60);
+  window.setVerticalSyncEnabled(true);
   window.setActive(false);
 
   cout << "Hello, cetrinet!" << endl;
