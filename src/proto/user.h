@@ -6,6 +6,7 @@
 namespace proto {
   typedef struct {
     std::string name;
+    bool ready;
   } user;
 }
 

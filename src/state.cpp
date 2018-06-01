@@ -100,6 +100,7 @@ void state_update(json payload){
         for(proto::user* eu : event.users){
           proto::user* nu = new proto::user;
           nu->name = eu->name;
+          nu->ready = false;
           new_users.push_back(nu);
         }
 
@@ -116,6 +117,7 @@ void state_update(json payload){
       for(proto::user* eu : event.users){
         proto::user* nu = new proto::user;
         nu->name = eu->name;
+        nu->ready = false;
         new_users.push_back(nu);
       }
 
@@ -133,5 +135,21 @@ void state_update(json payload){
     cout << "server tick" << endl;
 
     //TODO: hook up to game logic
+  }else if(payload["t"] == "greadystate"){
+    proto::greadystate event = proto::greadystate();
+    event.load_json(payload);
+
+    cout << "greadystate change for " << event.source << " in " << event.target << ": now " << event.ready << endl;
+
+    for(proto::channel* chan : channels){
+      if(chan->name == event.target){
+        for(auto user : chan->userdata){
+          if(user->name == event.source){
+            user->ready = event.ready;
+          }
+        }
+      }
+    }
+    ui_update_users();
   }
 }

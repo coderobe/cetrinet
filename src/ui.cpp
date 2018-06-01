@@ -75,7 +75,7 @@ void ui_update_users(){
     if(chan->name == ui_channel_current){
       list->removeAllItems();
       for(auto user : chan->userdata){
-        list->addItem(user->name, user->name);
+        list->addItem(((user->ready) ? "[R] " : "") + user->name, user->name);
       }
     }
   }

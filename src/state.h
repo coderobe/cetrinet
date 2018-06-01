@@ -15,6 +15,7 @@
 #include "proto/channellist.h"
 #include "proto/userlist.h"
 #include "proto/gtick.h"
+#include "proto/greadystate.h"
 
 void state_update(nlohmann::json event_payload);
 
