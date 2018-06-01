@@ -18,9 +18,9 @@ namespace proto {
   void greadystate::load_json(json payload){
     super::load_json(payload);
 
-    target = payload["d"].value("m", "<error>");
-    source = payload["d"].value("m", "<error>");
-    ready = payload["d"].value("m", false);
+    target = payload["d"].value("t", "<error>");
+    source = payload["d"].value("s", "<error>");
+    ready = payload["d"].value("r", false);
   }
 
   json greadystate::encode(){
