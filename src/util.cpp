@@ -54,6 +54,27 @@ namespace util {
     delete msg;
   }
 
+  void set_ready(string channel, bool ready){
+    proto::greadystate* msg = new proto::greadystate();
+    msg->target = channel;
+    msg->ready = ready;
+    net_send(json::to_msgpack(msg->encode()));
+    delete msg;
+  }
+
+  void toggle_ready(string channel){
+    for(auto chan : channels){
+      if(chan->name == channel){
+        for(auto user : chan->userdata){
+          if(user->name == username){
+            set_ready(chan->name, !user->ready);
+            return;
+          }
+        }
+      }
+    }
+  }
+
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;

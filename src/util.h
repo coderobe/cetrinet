@@ -21,6 +21,8 @@ namespace util{
   void add_message(std::string to, std::string from, std::string content, unsigned char color[3]);
   void send_message(std::string to, std::string content);
   void join_channel(std::string channel);
+  void set_ready(std::string channel, bool ready);
+  void toggle_ready(std::string channel);
   bool is_not_digit(char c);
 };
 

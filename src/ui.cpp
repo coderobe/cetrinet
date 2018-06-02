@@ -433,10 +433,39 @@ void ui_worker(){
       game_field_main_preview->add(hold_box, "preview_box_"+to_string(i));
     }
 
+    auto game_items = tgui::Panel::create();
+    game_items->setBackgroundColor(color_grey);
+    game_items->setSize(
+      bindWidth(game_field_main)+
+      bindWidth(game_field_main_preview)+
+      bindWidth(game_field_main_hold)+
+      padding*2,
+      25+padding*2);
+    game_items->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
+    panel_channel->add(game_items);
+    // TODO: Add item boxes
+
+    auto game_controls = tgui::Panel::create();
+    game_controls->setBackgroundColor(color_white);
+    game_controls->setSize(bindWidth(panel_channel)-(bindWidth(game_items)+padding), 25+padding*2);
+    game_controls->setPosition(bindRight(game_items)+padding, bindTop(game_items));
+    panel_channel->add(game_controls);
+
+    auto game_control_ready = tgui::Button::create();
+    game_control_ready->setPosition(border_weight*2, border_weight*2);
+    game_control_ready->setTextSize(14);
+    game_control_ready->setSize(95, bindHeight(game_controls)-border_weight*4);
+    game_control_ready->setText("Toggle Ready");
+    game_control_ready->connect("pressed", [=](){
+      util::toggle_ready(ui_channel_current);
+    });
+    game_controls->add(game_control_ready);
+    // TODO: Add Buttons for gstart, gstop,...
+
     auto game_field_secondary = tgui::Panel::create();
     game_field_secondary->setBackgroundColor(color_black);
     game_field_secondary->setSize((game_row_w*game_secondary_tile_size+border_weight*(game_row_w+2))*4+border_weight, (game_row_h*game_secondary_tile_size+border_weight*(game_row_h+1))*2+1);
-    game_field_secondary->setPosition(bindRight(game_field_main_preview)+padding, 0);
+    game_field_secondary->setPosition(bindRight(game_field_main_preview)+padding, bindTop(game_field_main_preview));
     panel_channel->add(game_field_secondary, "game_field_secondary");
 
     for(size_t player_id = 2; player_id <= 9; player_id++){
@@ -482,8 +511,8 @@ void ui_worker(){
     }
 
     auto panel_channel_chat_box = tgui::Panel::create();
-    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main)-padding*1.5);
-    panel_channel_chat_box->setPosition(0, bindBottom(game_field_main)+border_weight+padding);
+    panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main)-bindHeight(game_items)-padding*2.5);
+    panel_channel_chat_box->setPosition(0, bindBottom(game_controls)+border_weight+padding);
     panel_channel_chat_box->setBackgroundColor(color_black);
     panel_channel->add(panel_channel_chat_box);
     
