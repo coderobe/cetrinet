@@ -10,6 +10,7 @@ namespace proto {
   void greadystate::populate(){
     super::populate();
 
+    type = "greadystate";
     target = "";
     source = "";
     ready = false;
