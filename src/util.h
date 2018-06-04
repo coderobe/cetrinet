@@ -23,6 +23,8 @@ namespace util{
   void join_channel(std::string channel);
   void set_ready(std::string channel, bool ready);
   void toggle_ready(std::string channel);
+  void send_gstart(std::string channel);
+  void send_gstop(std::string channel);
   bool is_not_digit(char c);
 };
 

@@ -460,7 +460,26 @@ void ui_worker(){
       util::toggle_ready(ui_channel_current);
     });
     game_controls->add(game_control_ready);
-    // TODO: Add Buttons for gstart, gstop,...
+
+    auto game_control_start = tgui::Button::create();
+    game_control_start->setPosition(bindRight(game_control_ready)+border_weight*2, border_weight*2);
+    game_control_start->setTextSize(14);
+    game_control_start->setSize(95, bindHeight(game_controls)-border_weight*4);
+    game_control_start->setText("Start Game");
+    game_control_start->connect("pressed", [=](){
+      util::send_gstart(ui_channel_current);
+    });
+    game_controls->add(game_control_start);
+
+    auto game_control_stop = tgui::Button::create();
+    game_control_stop->setPosition(bindRight(game_control_start)+border_weight*2, border_weight*2);
+    game_control_stop->setTextSize(14);
+    game_control_stop->setSize(95, bindHeight(game_controls)-border_weight*4);
+    game_control_stop->setText("Stop Game");
+    game_control_stop->connect("pressed", [=](){
+      util::send_gstop(ui_channel_current);
+    });
+    game_controls->add(game_control_stop);
 
     auto game_field_secondary = tgui::Panel::create();
     game_field_secondary->setBackgroundColor(color_black);

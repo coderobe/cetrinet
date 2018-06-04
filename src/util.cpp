@@ -75,6 +75,20 @@ namespace util {
     }
   }
 
+  void send_gstart(string channel){
+    proto::gstart* msg = new proto::gstart();
+    msg->target = channel;
+    net_send(json::to_msgpack(msg->encode()));
+    delete msg;
+  }
+
+  void send_gstop(string channel){
+    proto::gstop* msg = new proto::gstop();
+    msg->target = channel;
+    net_send(json::to_msgpack(msg->encode()));
+    delete msg;
+  }
+
   void stdout_unsilence(){
     if(util::stdout_silenced){
       stdout_silenced = false;

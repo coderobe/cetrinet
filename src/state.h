@@ -16,6 +16,8 @@
 #include "proto/userlist.h"
 #include "proto/gtick.h"
 #include "proto/greadystate.h"
+#include "proto/gstart.h"
+#include "proto/gstop.h"
 
 void state_update(nlohmann::json event_payload);
 

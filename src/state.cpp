@@ -151,5 +151,19 @@ void state_update(json payload){
       }
     }
     ui_update_users();
+  }else if(payload["t"] == "gstart"){
+    proto::gstart event = proto::gstart();
+    event.load_json(payload);
+
+    cout << "gstart in " << event.target << " with " << event.users.size() << " users" << endl;
+
+    // TODO: hook up to game logic
+  }else if(payload["t"] == "gstop"){
+    proto::gstop event = proto::gstop();
+    event.load_json(payload);
+
+    cout << "gstop in " << event.target << endl;
+
+    // TODO: hook up to game logic
   }
 }
