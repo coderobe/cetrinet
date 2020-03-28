@@ -17,12 +17,10 @@ release: BUILDTYPE := release
 release: ${TARGET}
 	strip -S --strip-unneeded --remove-section=.note.gnu.gold-version --remove-section=.comment --remove-section=.note --remove-section=.note.gnu.build-id --remove-section=.note.ABI-tag ${TARGET}
 	sstrip -z ${TARGET}
-	upx --ultra-brute --overlay=strip ${TARGET}
 
 release-windows: BUILDTYPE := release
 release-windows: win${TARGET}.exe
 	x86_64-w64-mingw32-strip -S --strip-unneeded --remove-section=.note.gnu.gold-version --remove-section=.comment --remove-section=.note --remove-section=.note.gnu.build-id --remove-section=.note.ABI-tag win${TARGET}.exe
-	upx --ultra-brute --overlay=strip --strip-relocs=0 win${TARGET}.exe
 
 clean:
 	rm -rf build winbuild
