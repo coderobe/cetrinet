@@ -6,11 +6,6 @@ namespace proto {
   userlist::userlist(){
     populate();
   }
-  userlist::~userlist(){
-    for(user* u : users){
-      delete u;
-    }
-  }
 
   void userlist::populate(){
     super::populate();
@@ -23,7 +18,7 @@ namespace proto {
 
     json users_json = payload["d"].value("u", json::array());
     for(auto user_json : users_json){
-      user* u = new user;
+      std::shared_ptr<user> u = std::make_shared<user>();
       u->name = user_json;
       users.push_back(u);
     }
@@ -36,7 +31,7 @@ namespace proto {
     payload["d"]["c"] = channel;
 
     payload["d"]["u"] = json::array();
-    for(user* u : users){
+    for(std::shared_ptr<user> u : users){
       payload["d"]["u"] += {u->name};
     }
 

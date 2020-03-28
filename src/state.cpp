@@ -21,12 +21,12 @@ void state_update(json payload){
     proto::join event = proto::join();
     event.load_json(payload);
 
-    for(proto::channel* chan : channels){
+    for(shared_ptr<proto::channel> chan : channels){
       if(chan->name == event.target){
         if(event.user == username){
           chan->joined = true;
         }else{
-          proto::user* nu = new proto::user;
+          shared_ptr<proto::user> nu = make_shared<proto::user>();
           nu->name = event.user;
           chan->userdata.push_back(nu);
         }
@@ -40,7 +40,7 @@ void state_update(json payload){
     proto::part event = proto::part();
     event.load_json(payload);
 
-    for(proto::channel* chan : channels){
+    for(shared_ptr<proto::channel> chan : channels){
       if(chan->name == event.target){
         if(event.user == username){
           chan->joined = false;
@@ -76,10 +76,10 @@ void state_update(json payload){
     proto::channellist event = proto::channellist();
     event.load_json(payload);
 
-    for(proto::channel* chan : event.channels){
+    for(shared_ptr<proto::channel> chan : event.channels){
       cout << "found channel " << chan->name << " with " << chan->users << " users" << endl;
 
-      proto::channel* channel = new proto::channel;
+      shared_ptr<proto::channel> channel = make_shared<proto::channel>();
       channel->name = chan->name;
       channel->users = chan->users;
       channel->joined = chan->joined;
@@ -92,36 +92,32 @@ void state_update(json payload){
 
     cout << "userlist for channel " << event.channel << " reports " << event.users.size() << " users" << endl;
     bool found = false;
-    for(proto::channel* chan : channels){
+    for(shared_ptr<proto::channel> chan : channels){
       if(chan->name == event.channel){
         found = true;
 
-        vector<proto::user*> new_users;
-        for(proto::user* eu : event.users){
-          proto::user* nu = new proto::user;
+        vector<shared_ptr<proto::user>> new_users;
+        for(shared_ptr<proto::user> eu : event.users){
+          shared_ptr<proto::user> nu = make_shared<proto::user>();
           nu->name = eu->name;
           nu->ready = false;
           new_users.push_back(nu);
         }
-
         chan->userdata.swap(new_users);
-        for(proto::user* user : new_users){
-          delete user;
-        }
       }
     }
     if(!found){
       cout << "userlist-discovered channel " << event.channel << endl;
 
-      vector<proto::user*> new_users;
-      for(proto::user* eu : event.users){
-        proto::user* nu = new proto::user;
+      vector<shared_ptr<proto::user>> new_users;
+      for(shared_ptr<proto::user> eu : event.users){
+        shared_ptr<proto::user> nu = make_shared<proto::user>();
         nu->name = eu->name;
         nu->ready = false;
         new_users.push_back(nu);
       }
 
-      proto::channel* channel = new proto::channel;
+      shared_ptr<proto::channel> channel = make_shared<proto::channel>();
       channel->name = event.channel;
       channel->userdata = new_users;
       channel->joined = false;
@@ -141,7 +137,7 @@ void state_update(json payload){
 
     cout << "greadystate change for " << event.source << " in " << event.target << ": now " << event.ready << endl;
 
-    for(proto::channel* chan : channels){
+    for(shared_ptr<proto::channel> chan : channels){
       if(chan->name == event.target){
         for(auto user : chan->userdata){
           if(user->name == event.source){

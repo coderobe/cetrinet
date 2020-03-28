@@ -13,8 +13,7 @@ namespace proto {
     typedef base super;
   public:
     channellist();
-    ~channellist();
-    std::vector<channel *> channels;
+    std::vector<std::shared_ptr<channel>> channels;
 
     void populate();
     void load_json(nlohmann::json payload);

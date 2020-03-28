@@ -13,9 +13,8 @@ namespace proto {
     typedef base super;
   public:
     userlist();
-    ~userlist();
     std::string channel;
-    std::vector<user *> users;
+    std::vector<std::shared_ptr<user>> users;
 
     void populate();
     void load_json(nlohmann::json payload);

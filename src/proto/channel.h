@@ -10,8 +10,8 @@ namespace proto {
   typedef struct {
     std::string name;
     size_t users;
-    std::vector<user*> userdata;
-    std::vector<message*> messages;
+    std::vector<std::shared_ptr<user>> userdata;
+    std::vector<std::shared_ptr<message>> messages;
     bool joined;
   } channel;
 }

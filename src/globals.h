@@ -13,12 +13,12 @@
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 
 extern std::shared_ptr<WsClient> net_client;
-extern std::vector<std::thread*> threads;
+extern std::vector<std::shared_ptr<std::thread>> threads;
 extern std::string server;
 extern std::string port;
 extern std::string username;
-extern std::vector<proto::channel*> channels;
-extern std::vector<proto::message*> server_messages;
+extern std::vector<std::shared_ptr<proto::channel>> channels;
+extern std::vector<std::shared_ptr<proto::message>> server_messages;
 extern sf::RenderWindow window;
 extern tgui::Gui gui;
 extern sf::Color color_white;

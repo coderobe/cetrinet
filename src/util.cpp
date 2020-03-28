@@ -20,7 +20,7 @@ namespace util {
   }
 
   void add_message(string to, string from, string content, unsigned char color[3]){
-    proto::message* lmsg = new proto::message;
+    shared_ptr<proto::message> lmsg = make_shared<proto::message>();
     lmsg->to = to;
     lmsg->from = from;
     lmsg->content = content;
@@ -80,7 +80,7 @@ namespace util {
   void thread_start_net(){
     net_disconnect();
     cout << "Starting net worker" << endl;
-    threads.push_back(new thread(net_worker));
+    threads.push_back(std::make_shared<thread>(net_worker));
   }
 
   void thread_start_ui(){

@@ -6,11 +6,6 @@ namespace proto {
   channellist::channellist(){
     populate();
   }
-  channellist::~channellist(){
-    for(channel* c : channels){
-      delete c;
-    }
-  }
 
   void channellist::populate(){
     super::populate();
@@ -21,7 +16,7 @@ namespace proto {
 
     json channels_json = payload["d"].value("c", json::object());
     for(auto chan_json : channels_json){
-      channel* chan = new channel;
+      std::shared_ptr<channel> chan = std::make_shared<channel>();
       chan->name = chan_json.value("n", "<error>");
       chan->users = chan_json.value("u", 0);
       chan->joined = false;
@@ -34,7 +29,7 @@ namespace proto {
     json payload = super::encode();
 
     payload["d"]["c"] = json::object();
-    for(channel* chan : channels){
+    for(std::shared_ptr<channel> chan : channels){
       payload["d"]["c"] += {
         {"name", chan->name},
         {"users", chan->users}

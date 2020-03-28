@@ -12,12 +12,12 @@ using namespace std;
 
 // globals
 std::shared_ptr<WsClient> net_client = nullptr;
-std::vector<std::thread*> threads;
+std::vector<std::shared_ptr<std::thread>> threads;
 std::string server;
 std::string port;
 std::string username;
-std::vector<proto::channel*> channels;
-std::vector<proto::message*> server_messages;
+std::vector<std::shared_ptr<proto::channel>> channels;
+std::vector<std::shared_ptr<proto::message>> server_messages;
 sf::RenderWindow window(sf::VideoMode(948, 720), "cetrinet");
 tgui::Gui gui(window);
 sf::Color color_white = sf::Color::White;
@@ -29,10 +29,6 @@ sf::Color color_blue = sf::Color(0, 0, 255, 255);
 
 void clean_up(){
   while(!channels.empty()){
-    for(auto user : channels.front()->userdata){
-      delete user;
-    }
-    delete channels.front();
     channels.erase(channels.begin());
   }
 
@@ -52,13 +48,12 @@ int main(){
   util::thread_start_ui();
 
   while(!threads.empty()){
-    thread* t = threads.front();
+    shared_ptr<thread> t = threads.front();
     threads.erase(threads.begin());
     threads.shrink_to_fit();
     if(t->joinable()){
       t->join();
     }
-    delete t;
   }
 
   clean_up();
