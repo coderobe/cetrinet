@@ -11,7 +11,7 @@
 using namespace std;
 
 // globals
-WsClient* net_client = nullptr;
+std::shared_ptr<WsClient> net_client = nullptr;
 std::vector<std::thread*> threads;
 std::string server;
 std::string port;
@@ -56,8 +56,6 @@ int main(){
     threads.erase(threads.begin());
     threads.shrink_to_fit();
     if(t->joinable()){
-      if(net_client != nullptr)
-        net_client->stop();
       t->join();
     }
     delete t;

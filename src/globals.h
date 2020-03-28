@@ -12,7 +12,7 @@
 
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 
-extern WsClient* net_client;
+extern std::shared_ptr<WsClient> net_client;
 extern std::vector<std::thread*> threads;
 extern std::string server;
 extern std::string port;
