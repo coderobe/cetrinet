@@ -227,7 +227,7 @@ void onMenuSelected(tgui::Gui& gui, string menu){
     msgbox->setTitle("About");
     msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
     msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
-    msgbox->setText("cetrinet by coderobe\n2018\nhttps://coderobe.net");
+    msgbox->setText("cetrinet by coderobe\n2018-2020\nhttps://coderobe.net");
   }
   window.setActive(true);
 }
