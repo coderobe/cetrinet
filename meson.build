@@ -47,7 +47,6 @@ sources = glob.stdout().strip().split('\n')
 dependencies = [
   dependency('threads'),
   dependency('openssl'),
-  dependency('boost', modules: ['system']),
   dependency('tgui'),
   dependency('fontconfig'),
 ]
