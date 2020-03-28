@@ -38,10 +38,12 @@ void ui_gui_set_font(T gui, string font){
 }
 
 string ui_channel_current = "#lobby";
+mutex ui_update_chats_mutex;
 
 void ui_update_chats(){
-  tgui::ChatBox::Ptr chat_server = static_pointer_cast<tgui::ChatBox>(gui.get("panel_server_chat", true));
-  tgui::ChatBox::Ptr chat_channel = static_pointer_cast<tgui::ChatBox>(gui.get("panel_channel_chat", true));
+  lock_guard<mutex> lock(ui_update_chats_mutex);
+  tgui::ChatBox::Ptr chat_server = static_pointer_cast<tgui::ChatBox>(gui.get("panel_server_chat"));
+  tgui::ChatBox::Ptr chat_channel = static_pointer_cast<tgui::ChatBox>(gui.get("panel_channel_chat"));
 
   chat_server->removeAllLines();
   chat_channel->removeAllLines();
@@ -57,7 +59,7 @@ void ui_update_chats(){
 }
 
 void ui_update_channels(){
-  tgui::Tab::Ptr tabs = static_pointer_cast<tgui::Tab>(gui.get("tab_channels", true));
+  tgui::Tabs::Ptr tabs = static_pointer_cast<tgui::Tabs>(gui.get("tab_channels"));
 
   tabs->removeAll();
   tabs->add("Server");
@@ -70,7 +72,7 @@ void ui_update_channels(){
 }
 
 void ui_update_users(){
-  tgui::ListBox::Ptr list = static_pointer_cast<tgui::ListBox>(gui.get("panel_channel_users", true));
+  tgui::ListBox::Ptr list = static_pointer_cast<tgui::ListBox>(gui.get("panel_channel_users"));
 
   for(auto chan : channels){
     if(chan->name == ui_channel_current){
@@ -87,11 +89,11 @@ void onTabSelected(tgui::Gui& gui, string tab){
   if(ui_channel_current != tab){
     ui_channel_current = tab;
     if(tab == "Server"){
-      gui.get("panel_server")->show();
-      gui.get("panel_channel")->hide();
+      gui.get("panel_server")->setVisible(true);
+      gui.get("panel_channel")->setVisible(false);
     }else{
-      gui.get("panel_server")->hide();
-      gui.get("panel_channel")->show();
+      gui.get("panel_server")->setVisible(false);
+      gui.get("panel_channel")->setVisible(true);
       ui_update_users();
       ui_update_chats();
     }
@@ -108,17 +110,18 @@ void onChatSubmit(tgui::EditBox::Ptr input, string text){
 }
 
 void onMenuSelected(tgui::Gui& gui, string menu){
-  cout << menu << endl;
   if(menu == "Connect"){
     auto msgbox = tgui::MessageBox::create();
     gui.add(msgbox);
+    msgbox->setTitle("Connect");
+    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
     msgbox->setSize({300, 220});
     msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
 
     auto content = tgui::Panel::create();
     msgbox->add(content);
     content->setSize(bindWidth(msgbox), bindHeight(msgbox));
-    content->setBackgroundColor(color_white);
+    content->getRenderer()->setBackgroundColor(color_white);
 
     auto label_header = tgui::Label::create();
     content->add(label_header);
@@ -183,13 +186,15 @@ void onMenuSelected(tgui::Gui& gui, string menu){
   }else if(menu == "Join Channel"){
     auto msgbox = tgui::MessageBox::create();
     gui.add(msgbox);
+    msgbox->setTitle("Join Channel");
+    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
     msgbox->setSize({200, 90});
     msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
 
     auto content = tgui::Panel::create();
     msgbox->add(content);
     content->setSize(bindWidth(msgbox), bindHeight(msgbox));
-    content->setBackgroundColor(color_white);
+    content->getRenderer()->setBackgroundColor(color_white);
 
     auto label_channame = tgui::Label::create();
     label_channame->setPosition(8, 8);
@@ -218,9 +223,11 @@ void onMenuSelected(tgui::Gui& gui, string menu){
 
   }else if(menu == "About"){
     auto msgbox = tgui::MessageBox::create();
+    gui.add(msgbox);
+    msgbox->setTitle("About");
+    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
     msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
     msgbox->setText("cetrinet by coderobe\n2018\nhttps://coderobe.net");
-    gui.add(msgbox);
   }
   window.setActive(true);
 }
@@ -249,7 +256,7 @@ void ui_worker(){
     menubar->connect("MenuItemClicked", onMenuSelected, std::ref(gui));
     gui.add(menubar);
 
-    auto tabs = tgui::Tab::create();
+    auto tabs = tgui::Tabs::create();
     gui.add(tabs, "tab_channels");
     tabs->setTabHeight(20);
     tabs->setPosition(padding+2, 25);
@@ -268,16 +275,16 @@ void ui_worker(){
     panel_server_chat->setSize(panel_server->getSize().x, panel_server->getSize().y);
     panel_server_chat->setPosition(0, 0);
     panel_server_chat->setTextSize(font_size);
-    ui_gui_set_font(panel_server_chat, "monospace");
+    ui_gui_set_font(panel_server_chat->getRenderer(), "monospace");
     panel_server->add(panel_server_chat, "panel_server_chat");
 
     panel_server_chat->addLine("Welcome to cetrinet");
 
     auto panel_channel = tgui::Panel::create();
-    panel_channel->setBackgroundColor(color_white);
+    panel_channel->getRenderer()->setBackgroundColor(color_white);
     panel_channel->setSize(window.getSize().x-(padding*2), window.getSize().y-panel_offset-padding);
     panel_channel->setPosition(padding, panel_offset);
-    panel_channel->hide();
+    panel_channel->setVisible(false);
     gui.add(panel_channel, "panel_channel");
 
     size_t game_tile_size = 20;
@@ -292,13 +299,13 @@ void ui_worker(){
     auto game_field_main_label_box = tgui::Panel::create();
     auto game_field_main_hold = tgui::Panel::create();
 
-    game_field_main_hold->setBackgroundColor(color_black);
+    game_field_main_hold->getRenderer()->setBackgroundColor(color_black);
     game_field_main_hold->setSize(game_secondary_tile_size*game_field_main_box_tiles+border_weight*(game_field_main_box_tiles+3), bindHeight(game_field_main));
     game_field_main_hold->setPosition(0, 0);
     panel_channel->add(game_field_main_hold, "game_field_main_hold");
 
     auto game_field_main_hold_label_box = tgui::Panel::create();
-    game_field_main_hold_label_box->setBackgroundColor(color_white);
+    game_field_main_hold_label_box->getRenderer()->setBackgroundColor(color_white);
     game_field_main_hold_label_box->setSize(bindWidth(game_field_main_hold)-border_weight*2, bindHeight(game_field_main_label_box));
     game_field_main_hold_label_box->setPosition(border_weight, border_weight);
     game_field_main_hold->add(game_field_main_hold_label_box);
@@ -311,7 +318,7 @@ void ui_worker(){
 
     for(size_t i = 0; i < 6; i++){
       auto hold_box = tgui::Panel::create();
-      hold_box->setBackgroundColor(color_grey);
+      hold_box->getRenderer()->setBackgroundColor(color_grey);
       hold_box->setSize(
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles,
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles
@@ -321,19 +328,19 @@ void ui_worker(){
       if(i > 0){
         size_t l_i = i;
         while(l_i > 0){
-          l_height += bindHeight(game_field_main_hold->get("hold_box_"+to_string(l_i-1)))+l_offset;
+          l_height = l_height.getValue()+bindHeight(game_field_main_hold->get("hold_box_"+to_string(l_i-1)))+l_offset;
           l_i--;
         }
       }
       if(i < 6){
-        l_height += border_weight;
+        l_height = l_height.getValue()+border_weight;
       }
       hold_box->setPosition(border_weight, l_height);
 
       for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
         for(size_t l_y = 0; l_y < game_field_main_box_tiles; l_y++){
           auto game_field_hold_tile = tgui::Panel::create();
-          game_field_hold_tile->setBackgroundColor(color_white);
+          game_field_hold_tile->getRenderer()->setBackgroundColor(color_white);
           game_field_hold_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
           game_field_hold_tile->setPosition(
             border_weight+(border_weight+game_secondary_tile_size)*l_x,
@@ -345,12 +352,12 @@ void ui_worker(){
       game_field_main_hold->add(hold_box, "hold_box_"+to_string(i));
     }
 
-    game_field_main->setBackgroundColor(color_black);
+    game_field_main->getRenderer()->setBackgroundColor(color_black);
     game_field_main->setSize(game_row_w*game_tile_size+border_weight*(game_row_w+1), (1+game_row_h)*game_tile_size+border_weight*(game_row_h+1));
     game_field_main->setPosition(bindRight(game_field_main_hold)+padding, 0);
     panel_channel->add(game_field_main, "game_field_main");
 
-    game_field_main_label_box->setBackgroundColor(color_white);
+    game_field_main_label_box->getRenderer()->setBackgroundColor(color_white);
     game_field_main_label_box->setSize(game_row_w*game_tile_size+(border_weight*(game_row_w-1)), game_tile_size-border_weight);
     game_field_main_label_box->setPosition(border_weight, border_weight);
     game_field_main->add(game_field_main_label_box);
@@ -362,7 +369,7 @@ void ui_worker(){
     game_field_main_label_box->add(game_field_main_label);
 
     auto game_field_main_box = tgui::Panel::create();
-    game_field_main_box->setBackgroundColor(color_grey);
+    game_field_main_box->getRenderer()->setBackgroundColor(color_grey);
     game_field_main_box->setSize(
       bindWidth(game_field_main)-border_weight*2,
       bindHeight(game_field_main)-bindHeight(game_field_main_label_box)-border_weight*2
@@ -373,7 +380,7 @@ void ui_worker(){
     for(size_t x = 0; x < game_row_w; x++){
       for(size_t y = 0; y < game_row_h; y++){
         auto game_field_main_tile = tgui::Panel::create();
-        game_field_main_tile->setBackgroundColor(color_white);
+        game_field_main_tile->getRenderer()->setBackgroundColor(color_white);
         game_field_main_tile->setSize(game_tile_size, game_tile_size);
         game_field_main_tile->setPosition(border_weight+(border_weight+game_tile_size)*x, border_weight+(border_weight+game_tile_size)*y);
         game_field_main_box->add(game_field_main_tile);
@@ -381,13 +388,13 @@ void ui_worker(){
     }
 
     auto game_field_main_preview = tgui::Panel::create();
-    game_field_main_preview->setBackgroundColor(color_black);
+    game_field_main_preview->getRenderer()->setBackgroundColor(color_black);
     game_field_main_preview->setSize(game_secondary_tile_size*game_field_main_box_tiles+border_weight*(game_field_main_box_tiles+2), bindHeight(game_field_main));
     game_field_main_preview->setPosition(bindRight(game_field_main)+padding, 0);
     panel_channel->add(game_field_main_preview, "game_field_main_preview");
 
     auto game_field_main_preview_label_box = tgui::Panel::create();
-    game_field_main_preview_label_box->setBackgroundColor(color_white);
+    game_field_main_preview_label_box->getRenderer()->setBackgroundColor(color_white);
     game_field_main_preview_label_box->setSize(bindWidth(game_field_main_preview)-border_weight*2, bindHeight(game_field_main_label_box));
     game_field_main_preview_label_box->setPosition(border_weight, border_weight);
     game_field_main_preview->add(game_field_main_preview_label_box);
@@ -400,7 +407,7 @@ void ui_worker(){
 
     for(size_t i = 0; i < 6; i++){
       auto hold_box = tgui::Panel::create();
-      hold_box->setBackgroundColor(color_grey);
+      hold_box->getRenderer()->setBackgroundColor(color_grey);
       hold_box->setSize(
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles,
         game_secondary_tile_size*game_field_main_box_tiles+border_weight*game_field_main_box_tiles
@@ -410,19 +417,19 @@ void ui_worker(){
       if(i > 0){
         size_t l_i = i;
         while(l_i > 0){
-          l_height += bindHeight(game_field_main_preview->get("preview_box_"+to_string(l_i-1)))+l_offset;
+          l_height = l_height.getValue()+bindHeight(game_field_main_preview->get("preview_box_"+to_string(l_i-1)))+l_offset;
           l_i--;
         }
       }
       if(i < 6){
-        l_height += border_weight;
+        l_height = l_height.getValue()+border_weight;
       }
       hold_box->setPosition(border_weight, l_height);
 
       for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
         for(size_t l_y = 0; l_y < game_field_main_box_tiles; l_y++){
           auto game_field_hold_tile = tgui::Panel::create();
-          game_field_hold_tile->setBackgroundColor(color_white);
+          game_field_hold_tile->getRenderer()->setBackgroundColor(color_white);
           game_field_hold_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
           game_field_hold_tile->setPosition(
             border_weight+(border_weight+game_secondary_tile_size)*l_x,
@@ -435,7 +442,7 @@ void ui_worker(){
     }
 
     auto game_items = tgui::Panel::create();
-    game_items->setBackgroundColor(color_grey);
+    game_items->getRenderer()->setBackgroundColor(color_grey);
     game_items->setSize(
       bindWidth(game_field_main)+
       bindWidth(game_field_main_preview)+
@@ -447,7 +454,7 @@ void ui_worker(){
     // TODO: Add item boxes
 
     auto game_controls = tgui::Panel::create();
-    game_controls->setBackgroundColor(color_white);
+    game_controls->getRenderer()->setBackgroundColor(color_white);
     game_controls->setSize(bindWidth(panel_channel)-(bindWidth(game_items)+padding), 25+padding*2);
     game_controls->setPosition(bindRight(game_items)+padding, bindTop(game_items));
     panel_channel->add(game_controls);
@@ -483,16 +490,16 @@ void ui_worker(){
     game_controls->add(game_control_stop);
 
     auto game_field_secondary = tgui::Panel::create();
-    game_field_secondary->setBackgroundColor(color_black);
+    game_field_secondary->getRenderer()->setBackgroundColor(color_black);
     game_field_secondary->setSize((game_row_w*game_secondary_tile_size+border_weight*(game_row_w+2))*4+border_weight, (game_row_h*game_secondary_tile_size+border_weight*(game_row_h+1))*2+1);
     game_field_secondary->setPosition(bindRight(game_field_main_preview)+padding, bindTop(game_field_main_preview));
     panel_channel->add(game_field_secondary, "game_field_secondary");
 
     for(size_t player_id = 2; player_id <= 9; player_id++){
       auto game_field_player_secondary = tgui::Panel::create();
-      game_field_player_secondary->setBackgroundColor(color_grey);
+      game_field_player_secondary->getRenderer()->setBackgroundColor(color_grey);
 
-      tgui::Panel::Ptr previous_panel = static_pointer_cast<tgui::Panel>(gui.get("game_field_player_"+to_string(player_id-1), true));
+      tgui::Panel::Ptr previous_panel = static_pointer_cast<tgui::Panel>(gui.get("game_field_player_"+to_string(player_id-1)));
 
       tgui::Layout posh, posv;
       if(player_id == 2){
@@ -512,7 +519,7 @@ void ui_worker(){
       for(size_t x = 0; x < game_row_w; x++){
         for(size_t y = 0; y < game_row_h; y++){
           auto game_field_secondary_tile = tgui::Panel::create();
-          game_field_secondary_tile->setBackgroundColor(color_white);
+          game_field_secondary_tile->getRenderer()->setBackgroundColor(color_white);
           game_field_secondary_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
           game_field_secondary_tile->setPosition(border_weight+(border_weight+game_secondary_tile_size)*x, border_weight+(border_weight+game_secondary_tile_size)*y);
           game_field_player_secondary->add(game_field_secondary_tile);
@@ -524,7 +531,7 @@ void ui_worker(){
       game_field_secondary_label->setPosition((bindWidth(game_field_player_secondary)/2)-(bindWidth(game_field_secondary_label)/2),
         (bindHeight(game_field_player_secondary)/2)-(bindHeight(game_field_secondary_label)/2));
       game_field_secondary_label->setTextSize(font_size*1.8);
-      game_field_secondary_label->setOpacity(0.8);
+      game_field_secondary_label->getRenderer()->setOpacity(0.8);
       game_field_player_secondary->add(game_field_secondary_label, "game_field_player_label_"+to_string(player_id));
 
       game_field_secondary->add(game_field_player_secondary, "game_field_player_"+to_string(player_id));
@@ -533,14 +540,14 @@ void ui_worker(){
     auto panel_channel_chat_box = tgui::Panel::create();
     panel_channel_chat_box->setSize(bindWidth(panel_channel), bindHeight(panel_channel)-bindHeight(game_field_main)-bindHeight(game_items)-padding*2.5);
     panel_channel_chat_box->setPosition(0, bindBottom(game_controls)+border_weight+padding);
-    panel_channel_chat_box->setBackgroundColor(color_black);
+    panel_channel_chat_box->getRenderer()->setBackgroundColor(color_black);
     panel_channel->add(panel_channel_chat_box);
     
     auto panel_channel_chat = tgui::ChatBox::create();
     panel_channel_chat->setSize(bindWidth(panel_channel_chat_box)*0.8, bindHeight(panel_channel_chat_box)*0.85);
     panel_channel_chat->setPosition(border_weight, border_weight);
     panel_channel_chat->setTextSize(font_size);
-    ui_gui_set_font(panel_channel_chat, "monospace");
+    ui_gui_set_font(panel_channel_chat->getRenderer(), "monospace");
     panel_channel_chat_box->add(panel_channel_chat, "panel_channel_chat");
    
     auto panel_channel_chat_input = tgui::EditBox::create();
@@ -551,7 +558,7 @@ void ui_worker(){
     panel_channel_chat_input->setTextSize(font_size);
     panel_channel_chat_input->setDefaultText("Enter message...");
     panel_channel_chat_input->setSize(panel_channel_chat_input->getSize().x, panel_channel_chat_input->getSize().y-border_weight);
-    ui_gui_set_font(panel_channel_chat_input, "monospace");
+    ui_gui_set_font(panel_channel_chat_input->getRenderer(), "monospace");
 
     auto panel_channel_users = tgui::ListBox::create();
     panel_channel_users->setSize(bindWidth(panel_channel_chat_box)*0.2-border_weight*2, bindHeight(panel_channel_chat_box)-border_weight*2);

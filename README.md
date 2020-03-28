@@ -3,7 +3,7 @@
 ## Dependencies
 - meson
 - clang++ (with c++17 support)
-- TGUI https://github.com/texus/TGUI **(v 0.7)**
+- TGUI https://github.com/texus/TGUI **(v 0.8.7)**
 - nlohmann/json https://github.com/nlohmann/json
 - Simple WebSocket Server https://github.com/eidheim/Simple-WebSocket-Server
 
