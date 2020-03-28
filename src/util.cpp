@@ -13,6 +13,16 @@ namespace util {
   void add_info_message(string content){
     add_message("server", "cetrinet", content, (unsigned char[3]){0, 0, 100});
   }
+  void add_message_divider(){
+    shared_ptr<proto::message> lmsg = make_shared<proto::message>();
+    lmsg->to = "raw";
+    lmsg->content = "---";
+    lmsg->rgb[0] = 0;
+    lmsg->rgb[1] = 0;
+    lmsg->rgb[2] = 0;
+    server_messages.push_back(lmsg);
+    ui_update_chats();
+  }
 
   void add_message(string to, string from, string content){
     unsigned char color[3] = {0, 0, 0};
