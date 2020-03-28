@@ -7,7 +7,7 @@ shared_ptr<WsClient::Connection> net_connection;
 
 void net_send(vector<unsigned char> data){
   if(net_client != nullptr){
-    shared_ptr<WsClient::SendStream> stream = make_shared<WsClient::SendStream>();
+    shared_ptr<WsClient::OutMessage> stream = make_shared<WsClient::OutMessage>();
     for(unsigned char piece : data){
       *stream << piece;
     }
@@ -41,7 +41,7 @@ void net_worker(){
     cout << "connecting to '" << server << "' (port " << port << ") as '" << username << "'" << endl;
 
     net_client = new WsClient((server+":"+port+"/").c_str());
-    net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::Message> message){
+    net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::InMessage> message){
       string msg = string(message->string());
 
       json payload = json::from_msgpack(msg);
