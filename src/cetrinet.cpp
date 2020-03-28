@@ -32,10 +32,16 @@ void clean_up(){
     channels.erase(channels.begin());
   }
 
-  while(!server_messages.empty()){
-    delete server_messages.front();
-    server_messages.erase(server_messages.begin());
-  }
+  server_messages.erase(
+    std::remove_if(
+      server_messages.begin(),
+      server_messages.end(),
+      [](const shared_ptr<proto::message> msg) {
+        return (msg->to != "server") && (msg->to != "raw");
+      }
+    ),
+    server_messages.end()
+  );
 }
 
 int main(){
