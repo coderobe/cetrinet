@@ -40,7 +40,7 @@ void net_worker(){
       username = "TestUser#123"; //TODO: change me
     }
 
-    cout << "connecting to '" << server << "' (port " << port << ") as '" << username << "'" << endl;
+    util::add_notify_message("Connecting to '"+server+"' (port "+port+")");
 
     net_client = new WsClient((server+":"+port+"/").c_str());
     net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::InMessage> message){
@@ -59,7 +59,7 @@ void net_worker(){
         return;
       }
 
-      util::add_message("server", "cetrinet", "connected to server", (unsigned char[3]){0, 100, 0});
+      util::add_notify_message("Connected to server "+server+":"+port);
 
       proto::auth auth = proto::auth();
       auth.name = username;
@@ -77,7 +77,7 @@ void net_worker(){
       switch(ec.value()){
         case 111: // connection refused
           cout << "ECONNREFUSED" << endl;
-          util::add_message("server", "cetrinet", "connection refused", (unsigned char[3]){100, 0, 0});
+          util::add_error_message("Connection refused");
           break;
         case 125: // socket closed mid-operation, this is fine
         case 995:
@@ -89,7 +89,7 @@ void net_worker(){
           break;
         default:
           cout << "Unhandled error" << endl;
-          util::add_message("server", "cetrinet", "Unhandled error " + to_string(ec.value()) + ": "+ec.message(), (unsigned char[3]){100, 0, 0});
+          util::add_error_message("Unhandled error " + to_string(ec.value()) + ": "+ec.message());
       }
       net_disconnect();
     };

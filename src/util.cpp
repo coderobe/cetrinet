@@ -22,6 +22,16 @@ namespace util {
     return !isdigit(c);
   }
 
+  void add_notify_message(string content){
+    add_message("server", "cetrinet", content, (unsigned char[3]){0, 100, 0});
+  }
+  void add_error_message(string content){
+    add_message("server", "cetrinet", content, (unsigned char[3]){100, 0, 0});
+  }
+  void add_info_message(string content){
+    add_message("server", "cetrinet", content, (unsigned char[3]){0, 0, 100});
+  }
+
   void add_message(string to, string from, string content){
     unsigned char color[3] = {0, 0, 0};
     add_message(to, from, content, color);
@@ -36,6 +46,7 @@ namespace util {
     lmsg->rgb[1] = color[1];
     lmsg->rgb[2] = color[2];
     server_messages.push_back(lmsg);
+    cout << "[" << to << "] " << from << ": '" << content << "'" << endl;
     ui_update_chats();
   }
 
