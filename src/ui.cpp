@@ -37,7 +37,7 @@ void ui_gui_set_font(T gui, string font){
   #endif
 }
 
-string ui_channel_current = "#lobby";
+string ui_channel_current = "Server";
 mutex ui_update_chats_mutex;
 
 void ui_update_chats(){
@@ -220,7 +220,8 @@ void onMenuSelected(tgui::Gui& gui, string menu){
       util::join_channel(edit_channel->getText());
     });
   }else if(menu == "Leave Channel"){
-
+    if(ui_channel_current != "Server")
+      util::leave_channel(ui_channel_current);
   }else if(menu == "About"){
     auto msgbox = tgui::MessageBox::create();
     gui.add(msgbox);

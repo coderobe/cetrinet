@@ -45,6 +45,12 @@ namespace util {
     net_send(json::to_msgpack(msg->encode()));
   }
 
+  void leave_channel(string channel){
+    shared_ptr<proto::part> msg = make_shared<proto::part>();
+    msg->target = channel;
+    net_send(json::to_msgpack(msg->encode()));
+  }
+
   void set_ready(string channel, bool ready){
     shared_ptr<proto::greadystate> msg = make_shared<proto::greadystate>();
     msg->target = channel;
