@@ -236,10 +236,6 @@ void onMenuSelected(tgui::Gui& gui, string menu){
   window.setActive(true);
 }
 
-void ui_handle_disconnect(){
-  util::add_message("server", "cetrinet", "Disconnected from server", (unsigned char[3]){100, 0, 0});  
-}
-
 void ui_worker(){
   try{
     ui_gui_set_font(&gui, "sans");
