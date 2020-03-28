@@ -19,10 +19,8 @@ void net_send(vector<unsigned char> data){
 void net_disconnect(){
   lock_guard<mutex> lock(net_disconnect_mutex);
   if(net_client != nullptr){
-    cout << "net disconnect" << endl;
     net_connection = nullptr;
     net_client->stop();
-    cout << "net disconnect done" << endl;
   }
 }
 
@@ -43,7 +41,8 @@ void net_worker(){
 
   net_client.reset(new WsClient((server+":"+port+"/").c_str()));
   clean_up();
-  util::add_notify_message("Connecting to '"+server+"' (port "+port+")");
+  util::add_message_divider();
+  util::add_notify_message("Connecting to '"+server+":"+port+"'...");
 
   net_client->on_message = [](shared_ptr<WsClient::Connection> connection, shared_ptr<WsClient::InMessage> message){
     string msg = message->string();
@@ -54,7 +53,6 @@ void net_worker(){
     state_update(payload);
   };
   net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
-    cout << "connection opened" << endl;
     net_connection = std::move(connection);
 
     util::add_notify_message("Connected to server "+server+":"+port);
@@ -66,16 +64,15 @@ void net_worker(){
     username = username.substr(0, username.find("#"));
   };
   net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
-    cout << "connection closed" << endl;
+    util::add_info_message("The remote host closed the connection");
     net_disconnect();
   };
   // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
   net_client->on_error = [](shared_ptr<WsClient::Connection> connection, const SimpleWeb::error_code &ec) {
-    cerr << "info " << ec << ", message: " << ec.message() << endl;
     switch(ec.value()){
+      case 1: // host not found (dns)
       case 111: // connection refused
-        cout << "ECONNREFUSED" << endl;
-        util::add_error_message("Connection refused");
+        util::add_error_message(ec.message());
         break;
       case 125: // socket closed mid-operation, this is fine
       case 995:
@@ -86,12 +83,12 @@ void net_worker(){
         }
         break;
       default:
-        cout << "Unhandled error" << endl;
         util::add_error_message("Unhandled error " + to_string(ec.value()) + ": "+ec.message());
+        cerr << "info " << ec << ", message: " << ec.message() << endl;
     }
     net_disconnect();
   };
 
   net_client->start();
-  ui_handle_disconnect();
+  util::add_info_message("Disconnected from server");
 }
