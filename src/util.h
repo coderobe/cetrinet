@@ -7,6 +7,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <string>
+#include <chrono>
 
 #include "globals.h"
 #include "net.h"

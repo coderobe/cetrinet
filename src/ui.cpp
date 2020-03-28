@@ -48,11 +48,19 @@ void ui_update_chats(){
   chat_server->removeAllLines();
   chat_channel->removeAllLines();
   for(auto msg : server_messages){
+    if(msg->to == "raw"){ // raw text, no further processing
+      chat_server->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      chat_channel->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      continue;
+    }
+
+    string time = ctime(&(msg->time));
+    time.pop_back(); // remove trailing newline
     if(msg->to == "server"){
-      chat_server->addLine(msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      chat_server->addLine(time+" | "+msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
     }
     if(msg->to == ui_channel_current || msg->to == "server"){
-      chat_channel->addLine(msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      chat_channel->addLine(time+" | "+msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
     }
   }
   ui_needs_redraw = true;

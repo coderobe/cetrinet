@@ -37,8 +37,11 @@ namespace util {
     lmsg->rgb[0] = color[0];
     lmsg->rgb[1] = color[1];
     lmsg->rgb[2] = color[2];
+    lmsg->time = chrono::system_clock::to_time_t(chrono::system_clock::now());
     server_messages.push_back(lmsg);
-    cout << "[" << to << "] " << from << ": '" << content << "'" << endl;
+    string time = ctime(&(lmsg->time));
+    time.pop_back(); // remove trailing newline
+    cout << time << " | [" << to << "] " << from << ": '" << content << "'" << endl;
     ui_update_chats();
   }
 
