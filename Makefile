@@ -28,7 +28,7 @@ clean:
 	rm -rf build winbuild
 
 build/build.ninja:
-	CXX=${CXX} meson --buildtype ${BUILDTYPE} . build
+	PKG_CONFIG_PATH="vendor/pkgconfig" CXX=${CXX} meson --buildtype ${BUILDTYPE} . build
 
 winbuild/build.ninja:
 	meson --buildtype ${BUILDTYPE} --cross-file windows.xcc . winbuild
