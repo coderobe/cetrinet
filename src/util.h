@@ -13,8 +13,6 @@
 #include "proto/message.h"
 
 namespace util{
-  void stdout_silence();
-  void stdout_unsilence();
   void thread_start_net();
   void thread_start_ui();
   void add_notify_message(std::string content);
@@ -28,7 +26,6 @@ namespace util{
   void toggle_ready(std::string channel);
   void send_gstart(std::string channel);
   void send_gstop(std::string channel);
-  bool is_not_digit(char c);
 };
 
 #endif

@@ -4,24 +4,6 @@ using namespace std;
 using json = nlohmann::json;
 
 namespace util {
-  atomic<bool> stdout_silenced = false;
-
-  void stdout_silence(){
-    if(!util::stdout_silenced){
-      stdout_silenced = true;
-
-      #ifdef WINDOWS
-        cerr << "util::stdout_silence() not implemented on this platform" << endl;
-      #else
-        freopen("/dev/null", "w", stdout);
-      #endif
-    }
-  }
-
-  bool is_not_digit(char c){
-    return !isdigit(c);
-  }
-
   void add_notify_message(string content){
     add_message("server", "cetrinet", content, (unsigned char[3]){0, 100, 0});
   }
@@ -51,26 +33,23 @@ namespace util {
   }
 
   void send_message(string to, string content){
-    proto::cmsg* msg = new proto::cmsg();
+    shared_ptr<proto::cmsg> msg = make_shared<proto::cmsg>();
     msg->target = to;
     msg->message = content;
     net_send(json::to_msgpack(msg->encode()));
-    delete msg;
   }
 
   void join_channel(string channel){
-    proto::join* msg = new proto::join();
+    shared_ptr<proto::join> msg = make_shared<proto::join>();
     msg->target = channel;
     net_send(json::to_msgpack(msg->encode()));
-    delete msg;
   }
 
   void set_ready(string channel, bool ready){
-    proto::greadystate* msg = new proto::greadystate();
+    shared_ptr<proto::greadystate> msg = make_shared<proto::greadystate>();
     msg->target = channel;
     msg->ready = ready;
     net_send(json::to_msgpack(msg->encode()));
-    delete msg;
   }
 
   void toggle_ready(string channel){
@@ -87,29 +66,15 @@ namespace util {
   }
 
   void send_gstart(string channel){
-    proto::gstart* msg = new proto::gstart();
+    shared_ptr<proto::gstart> msg = make_shared<proto::gstart>();
     msg->target = channel;
     net_send(json::to_msgpack(msg->encode()));
-    delete msg;
   }
 
   void send_gstop(string channel){
-    proto::gstop* msg = new proto::gstop();
+    shared_ptr<proto::gstop> msg = make_shared<proto::gstop>();
     msg->target = channel;
     net_send(json::to_msgpack(msg->encode()));
-    delete msg;
-  }
-
-  void stdout_unsilence(){
-    if(util::stdout_silenced){
-      stdout_silenced = false;
-
-      #ifdef WINDOWS
-        cerr << "util::stdout_unsilence() not implemented on this platform" << endl;
-      #else
-        freopen("/dev/tty", "w", stdout);
-      #endif
-    }
   }
 
   void thread_start_net(){
