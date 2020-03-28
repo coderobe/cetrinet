@@ -1,6 +1,8 @@
 project('cetrinet', 'cpp',
   default_options: [
     'cpp_std=c++17',
+    'b_lto=true',
+    'b_pie=true',
   ],
 )
 
@@ -8,7 +10,7 @@ if get_option('buildtype').startswith('debug')
   add_project_arguments(
     '-Og',
     '-g',
-    '-fsanitize=address',
+    '-fsanitize=address,undefined',
     '-fno-omit-frame-pointer',
     language: 'cpp',
   )
