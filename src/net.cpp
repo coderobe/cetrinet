@@ -4,6 +4,7 @@ using namespace std;
 using json = nlohmann::json;
 
 shared_ptr<WsClient::Connection> net_connection;
+mutex net_disconnect_mutex;
 
 void net_send(vector<unsigned char> data){
   if(net_client != nullptr){
@@ -16,11 +17,12 @@ void net_send(vector<unsigned char> data){
 }
 
 void net_disconnect(){
+  lock_guard<mutex> lock(net_disconnect_mutex);
   if(net_client != nullptr){
+    cout << "net disconnect" << endl;
+    net_connection.reset();
     net_client->stop();
-  }
-  while(net_client != nullptr){
-    this_thread::sleep_for(chrono::milliseconds(10));
+    net_client = nullptr;
   }
 }
 
@@ -51,7 +53,7 @@ void net_worker(){
     };
     net_client->on_open = [](shared_ptr<WsClient::Connection> connection){
       cout << "connection opened" << endl;
-      net_connection = connection;
+      net_connection = std::move(connection);
 
       if(username.substr(0, username.find("#")).length() < 1){
         return;
@@ -67,7 +69,7 @@ void net_worker(){
     };
     net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
       cout << "connection closed" << endl;
-      util::add_message("server", "cetrinet", "disconnected from server", (unsigned char[3]){100, 0, 0});
+      net_disconnect();
     };
     // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
     net_client->on_error = [](shared_ptr<WsClient::Connection> connection, const SimpleWeb::error_code &ec) {
@@ -89,19 +91,12 @@ void net_worker(){
           cout << "Unhandled error" << endl;
           util::add_message("server", "cetrinet", "Unhandled error " + to_string(ec.value()) + ": "+ec.message(), (unsigned char[3]){100, 0, 0});
       }
+      net_disconnect();
     };
 
     net_client->start();
-    if(net_client != nullptr){
-      delete net_client;
-      net_client = nullptr;
-    }
     ui_handle_disconnect();
   } else {
-    net_client->stop();
-    while(net_client != nullptr){
-      this_thread::sleep_for(chrono::milliseconds(10));
-    }
-    net_worker();
+    cerr << "net worker is already running" << endl;
   }
 }

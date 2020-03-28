@@ -102,6 +102,7 @@ namespace util {
   }
 
   void thread_start_net(){
+    net_disconnect();
     cout << "Starting net worker" << endl;
     threads.push_back(new thread(net_worker));
   }
