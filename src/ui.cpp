@@ -6,6 +6,7 @@ using json = nlohmann::json;
 atomic<bool> ui_needs_redraw = true;
 
 string ui_get_font_path(const char* name){
+  string font_path_str;
   FcConfig* config = FcInitLoadConfigAndFonts();
   FcPattern* pattern = FcNameParse((const FcChar8*)name);
   FcConfigSubstitute(config, pattern, FcMatchPattern);
@@ -15,13 +16,13 @@ string ui_get_font_path(const char* name){
   if(font){
     FcChar8* font_path = NULL;
     if(FcPatternGetString(font, FC_FILE, 0, &font_path) == FcResultMatch){
-      return string((const char*)font_path);
+      font_path_str = (const char*)font_path;
     }
   }
   FcPatternDestroy(font);
   FcPatternDestroy(pattern);
   FcConfigDestroy(config);
-  return string("");
+  return font_path_str;
 }
 
 bool ui_running(){
