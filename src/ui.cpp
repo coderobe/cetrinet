@@ -217,7 +217,10 @@ void onMenuSelected(tgui::Gui& gui, string menu){
     button_join->setText("Join");
     button_join->connect("pressed", [=](){
       msgbox->getParent()->remove(msgbox);
-      util::join_channel(edit_channel->getText());
+      if(edit_channel->getText().getSize() > 0)
+        util::join_channel(edit_channel->getText());
+      else
+        util::add_error_message("No channel name specified");
     });
   }else if(menu == "Leave Channel"){
     if(ui_channel_current != "Server")
