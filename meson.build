@@ -51,6 +51,7 @@ dependencies = [
   dependency('openssl'),
   dependency('tgui'),
   dependency('fontconfig'),
+  dependency('sfml-graphics'),
 ]
 
 exe = executable(
