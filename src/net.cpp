@@ -74,6 +74,9 @@ void net_worker(){
       case 111: // connection refused
         util::add_error_message(ec.message());
         break;
+      case 2: // end of file
+        util::add_error_message("The server unexpectedly closed the connection");
+        break;
       case 125: // socket closed mid-operation, this is fine
       case 995:
         if(!ui_running()){
