@@ -599,6 +599,7 @@ void ui_worker(){
       gui.handleEvent(event);
     }
     if(ui_needs_redraw){
+      lock_guard<mutex> lock(ui_update_chats_mutex);
       ui_has_drawn = true;
       window.clear(color_white);
       gui.draw();
