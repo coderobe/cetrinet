@@ -49,6 +49,7 @@ namespace util {
   }
 
   void add_message(string to, string from, string content, unsigned char color[3]){
+    from = (from.length() == 0 ? "" : from+": ");
     shared_ptr<proto::message> lmsg = make_shared<proto::message>();
     lmsg->to = to;
     lmsg->from = from;
@@ -60,7 +61,15 @@ namespace util {
     server_messages.push_back(lmsg);
     string time = ctime(&(lmsg->time));
     time.pop_back(); // remove trailing newline
-    cout << time << " | [" << to << "] " << from << ": '" << content << "'" << endl;
+    string timepadding(time.length(), ' '); // padding for multiline strings
+    string frompadding(from.length(), ' ');
+
+    bool first_line = true;
+    istringstream lines(content);
+    for(string line; getline(lines, line, '\n'); [](string to, string from, string line, bool& first_line, string time, string timepadding, string frompadding){
+      cout << (first_line ? time : timepadding) << " | [" << to << "] " << (first_line ? from : frompadding) << line << endl;
+      first_line = false;
+    }(to, from, line, first_line, time, timepadding, frompadding));
     ui_update_chats();
   }
 

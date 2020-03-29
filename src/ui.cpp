@@ -56,12 +56,20 @@ void ui_update_chats(){
 
     string time = ctime(&(msg->time));
     time.pop_back(); // remove trailing newline
-    if(msg->to == "server"){
-      chat_server->addLine(time+" | "+msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-    }
-    if(msg->to == ui_channel_current || msg->to == "server"){
-      chat_channel->addLine(time+" | "+msg->from+": "+msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-    }
+    string timepadding(time.length(), ' '); // padding for multiline strings
+    string frompadding(msg->from.length(), ' ');
+
+    bool first_line = true;
+    istringstream lines(msg->content);
+    for(string line; getline(lines, line, '\n'); [msg, chat_server, chat_channel](string line, bool& first_line, string time, string timepadding, string frompadding){
+      if(msg->to == "server"){
+        chat_server->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      }
+      if(msg->to == ui_channel_current || msg->to == "server"){
+        chat_channel->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+      }
+      first_line = false;
+    }(line, first_line, time, timepadding, frompadding));
   }
   ui_needs_redraw = true;
 }
