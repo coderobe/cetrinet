@@ -16,6 +16,11 @@
 namespace util{
   void thread_start_net();
   void thread_start_ui();
+  void add_muted_message_for(std::string channel, std::string content);
+  void add_notify_message_for(std::string channel, std::string content);
+  void add_error_message_for(std::string channel, std::string content);
+  void add_info_message_for(std::string channel, std::string content);
+  void add_muted_message(std::string content);
   void add_notify_message(std::string content);
   void add_error_message(std::string content);
   void add_info_message(std::string content);

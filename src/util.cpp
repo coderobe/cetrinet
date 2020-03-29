@@ -4,15 +4,34 @@ using namespace std;
 using json = nlohmann::json;
 
 namespace util {
+  void add_muted_message_for(string channel, string content){
+    add_message(channel, "", content, (unsigned char[3]){75, 75, 75});
+  }
+  void add_muted_message(string content){
+    add_muted_message_for("server", content);
+  }
+
+  void add_notify_message_for(string channel, string content){
+    add_message(channel, "", content, (unsigned char[3]){0, 100, 0});
+  }
   void add_notify_message(string content){
-    add_message("server", "cetrinet", content, (unsigned char[3]){0, 100, 0});
+    add_notify_message_for("server", content);
+  }
+
+  void add_error_message_for(string channel, string content){
+    add_message(channel, "", content, (unsigned char[3]){100, 0, 0});
   }
   void add_error_message(string content){
-    add_message("server", "cetrinet", content, (unsigned char[3]){100, 0, 0});
+    add_error_message_for("server", content);
+  }
+
+  void add_info_message_for(string channel, string content){
+    add_message(channel, "", content, (unsigned char[3]){0, 0, 100});
   }
   void add_info_message(string content){
-    add_message("server", "cetrinet", content, (unsigned char[3]){0, 0, 100});
+    add_info_message_for("server", content);
   }
+
   void add_message_divider(){
     shared_ptr<proto::message> lmsg = make_shared<proto::message>();
     lmsg->to = "raw";
