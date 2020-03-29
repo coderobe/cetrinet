@@ -37,6 +37,9 @@ void state_update(json payload){
       util::add_muted_message("Server sent a join event for an unknown channel ("+event.target+")");
 
       vector<shared_ptr<proto::user>> new_users;
+      shared_ptr<proto::user> nu = make_shared<proto::user>();
+      nu->name = event.user;
+      new_users.push_back(nu);
       shared_ptr<proto::channel> channel = make_shared<proto::channel>();
       channel->name = event.target;
       channel->userdata = new_users;
