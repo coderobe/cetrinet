@@ -17,7 +17,7 @@ namespace proto {
     json channels_json = payload["d"].value("c", json::object());
     for(auto chan_json : channels_json){
       std::shared_ptr<channel> chan = std::make_shared<channel>();
-      chan->name = chan_json.value("n", "<error>");
+      chan->name = chan_json.value("t", "<error>");
       chan->users = chan_json.value("u", 0);
       chan->joined = false;
       channels.push_back(chan);
@@ -31,8 +31,8 @@ namespace proto {
     payload["d"]["c"] = json::object();
     for(std::shared_ptr<channel> chan : channels){
       payload["d"]["c"] += {
-        {"name", chan->name},
-        {"users", chan->users}
+        {"t", chan->name},
+        {"u", chan->users}
       };
     }
 
