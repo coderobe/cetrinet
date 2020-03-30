@@ -57,11 +57,7 @@ void net_worker(){
 
     util::add_notify_message("Connected to server "+server+":"+port);
 
-    proto::auth auth = proto::auth();
-    auth.name = username;
-    username = username.substr(0, username.find("#"));
-    util::add_muted_message("Authenticating as '"+username+"'...");
-    net_send(json::to_msgpack(auth.encode()));
+    util::authenticate_as(username);
   };
   net_client->on_close = [](shared_ptr<WsClient::Connection> connection, int status, const string& reason){
     util::add_info_message("The remote host closed the connection");
