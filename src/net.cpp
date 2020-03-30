@@ -17,6 +17,11 @@ void net_send(vector<unsigned char> data){
   }
 }
 
+void net_send(json payload){
+  cout << "sent message: version " << payload["v"] << ", type " << payload["t"] << endl;
+  net_send(json::to_msgpack(payload));
+}
+
 void net_disconnect(){
   scoped_lock lock(net_disconnect_mutex);
   if(net_client != nullptr){

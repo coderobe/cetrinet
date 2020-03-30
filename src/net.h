@@ -14,5 +14,6 @@ extern std::atomic<bool> net_connected;
 void net_worker();
 void net_disconnect();
 void net_send(std::vector<unsigned char> data);
+void net_send(nlohmann::json payload);
 
 #endif
