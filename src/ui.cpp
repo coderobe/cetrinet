@@ -81,13 +81,16 @@ void ui_update_chats(){
 void ui_update_channels(){
   scoped_lock lock(ui_update_channels_lock, channels_lock);
   tgui::Tabs::Ptr tabs = static_pointer_cast<tgui::Tabs>(gui.get("tab_channels"));
+  tgui::ListBox::Ptr list = static_pointer_cast<tgui::ListBox>(gui.get("channel_list"));
 
   tabs->removeAll();
   tabs->add("Server");
+  list->removeAllItems();
   for(auto chan : channels){
     if(chan->joined){
       tabs->add(chan->name);
     }
+    list->addItem(chan->name+" ("+to_string(max(chan->users, chan->userdata.size()))+" users)");
   }
   ui_needs_redraw = true;
 }
@@ -104,6 +107,10 @@ void ui_update_users(){
     }
   }
   ui_needs_redraw = true;
+}
+
+void ui_show_reauth(){
+  gui.get("menu_reauthenticate")->setVisible(true);
 }
 
 void onTabSelected(tgui::Gui& gui, string tab){
@@ -132,127 +139,25 @@ void onChatSubmit(tgui::EditBox::Ptr input, string text){
 
 void onMenuSelected(tgui::Gui& gui, string menu){
   if(menu == "Connect"){
-    auto msgbox = tgui::MessageBox::create();
-    gui.add(msgbox);
-    msgbox->setTitle("Connect");
-    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
-    msgbox->setSize({300, 220});
-    msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
+    if(gui.get("menu_reauthenticate")->isVisible()) return;
 
-    auto content = tgui::Panel::create();
-    msgbox->add(content);
-    content->setSize(bindWidth(msgbox), bindHeight(msgbox));
-    content->getRenderer()->setBackgroundColor(color_white);
-
-    auto label_header = tgui::Label::create();
-    content->add(label_header);
-    label_header->setPosition(8, 8);
-    label_header->setTextSize(18);
-    label_header->setText("Connect to Server");
-
-    auto label_server = tgui::Label::create();
-    content->add(label_server);
-    label_server->setPosition(8, bindBottom(label_header));
-    label_server->setTextSize(14);
-    label_server->setText("Server");
-
-    auto edit_server = tgui::EditBox::create();
-    content->add(edit_server);
-    edit_server->setPosition(8, bindBottom(label_server));
-    edit_server->setTextSize(14);
-    edit_server->setSize(bindWidth(content)-8*2, bindHeight(label_server));
-    edit_server->setDefaultText("rrerrware.download");
-
-    auto label_port = tgui::Label::create();
-    content->add(label_port);
-    label_port->setPosition(8, bindBottom(edit_server)+8);
-    label_port->setTextSize(14);
-    label_port->setText("Port");
-
-    auto edit_port = tgui::EditBox::create();
-    content->add(edit_port);
-    edit_port->setPosition(8, bindBottom(label_port));
-    edit_port->setTextSize(14);
-    edit_port->setSize(bindWidth(content)-8*2, bindHeight(label_port));
-    edit_port->setDefaultText("28420");
-
-    auto label_username = tgui::Label::create();
-    content->add(label_username);
-    label_username->setPosition(8, bindBottom(edit_port)+8);
-    label_username->setTextSize(14);
-    label_username->setText("Username");
-
-    auto edit_username = tgui::EditBox::create();
-    content->add(edit_username);
-    edit_username->setPosition(8, bindBottom(label_username));
-    edit_username->setTextSize(14);
-    edit_username->setSize(bindWidth(content)-8*2, bindHeight(label_username));
-    edit_username->setDefaultText("cetrinet user");
-
-    auto button_connect = tgui::Button::create();
-    content->add(button_connect);
-    button_connect->setPosition(8, bindBottom(edit_username)+8*2);
-    button_connect->setTextSize(14);
-    button_connect->setSize(bindWidth(content)-8*2, bindHeight(label_header));
-    button_connect->setText("Connect");
-    button_connect->connect("pressed", [=](){
-      msgbox->getParent()->remove(msgbox);
-      server = edit_server->getText();
-      port = edit_port->getText();
-      username = edit_username->getText();
-      util::thread_start_net();
-    });
+    gui.get("menu_connect")->setVisible(true);
   }else if(menu == "Disconnect"){
-    net_disconnect();
+    if(net_connected)
+      net_disconnect();
+    else
+      util::add_error_message("Not connected");
+  }else if(menu == "Channel list"){
+    gui.get("menu_channel_list")->setVisible(true);
   }else if(menu == "Join Channel"){
-    auto msgbox = tgui::MessageBox::create();
-    gui.add(msgbox);
-    msgbox->setTitle("Join Channel");
-    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
-    msgbox->setSize({200, 90});
-    msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
-
-    auto content = tgui::Panel::create();
-    msgbox->add(content);
-    content->setSize(bindWidth(msgbox), bindHeight(msgbox));
-    content->getRenderer()->setBackgroundColor(color_white);
-
-    auto label_channame = tgui::Label::create();
-    label_channame->setPosition(8, 8);
-    label_channame->setTextSize(14);
-    label_channame->setText("Channel Name");
-    content->add(label_channame);
-
-    auto edit_channel = tgui::EditBox::create();
-    edit_channel->setPosition(bindLeft(label_channame), bindBottom(label_channame));
-    edit_channel->setTextSize(14);
-    edit_channel->setSize(bindWidth(content)-8*2, bindHeight(label_channame));
-    edit_channel->setDefaultText("#lobby");
-    content->add(edit_channel);
-
-    auto button_join = tgui::Button::create();
-    content->add(button_join);
-    button_join->setPosition(8, bindBottom(edit_channel)+8*2);
-    button_join->setTextSize(14);
-    button_join->setSize(bindWidth(content)-8*2, bindHeight(edit_channel));
-    button_join->setText("Join");
-    button_join->connect("pressed", [=](){
-      msgbox->getParent()->remove(msgbox);
-      if(edit_channel->getText().getSize() > 0)
-        util::join_channel(edit_channel->getText());
-      else
-        util::add_error_message("No channel name specified");
-    });
+    gui.get("menu_join_channel")->setVisible(true);
   }else if(menu == "Leave Channel"){
     if(ui_channel_current != "Server")
       util::leave_channel(ui_channel_current);
+    else
+      util::add_error_message("No channel selected");
   }else if(menu == "About"){
-    auto msgbox = tgui::MessageBox::create();
-    gui.add(msgbox);
-    msgbox->setTitle("About");
-    msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
-    msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
-    msgbox->setText("cetrinet by coderobe\n2018-2020\nhttps://coderobe.net");
+    gui.get("menu_about")->setVisible(true);
   }
   window.setActive(true);
 }
@@ -270,6 +175,7 @@ void ui_worker(){
     menubar->addMenuItem("Connect");
     menubar->addMenuItem("Disconnect");
     menubar->addMenu("Channels");
+    menubar->addMenuItem("Channel list");
     menubar->addMenuItem("Join Channel");
     menubar->addMenuItem("Leave Channel");
     menubar->addMenu("Help");
@@ -282,7 +188,6 @@ void ui_worker(){
     tabs->setTabHeight(20);
     tabs->setPosition(padding+2, 25);
     tabs->setTextSize(font_size);
-    ui_update_channels();
     tabs->connect("TabSelected", onTabSelected, std::ref(gui));
 
     size_t panel_offset = 50;
@@ -356,6 +261,7 @@ void ui_worker(){
       if(i < 6){
         l_height = l_height.getValue()+border_weight;
       }
+      cout << "hold box " << i << " height " << l_height.getValue() << endl;
       hold_box->setPosition(border_weight, l_height);
 
       for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
@@ -404,7 +310,7 @@ void ui_worker(){
         game_field_main_tile->getRenderer()->setBackgroundColor(color_white);
         game_field_main_tile->setSize(game_tile_size, game_tile_size);
         game_field_main_tile->setPosition(border_weight+(border_weight+game_tile_size)*x, border_weight+(border_weight+game_tile_size)*y);
-        game_field_main_box->add(game_field_main_tile);
+        game_field_main_box->add(game_field_main_tile, "game_field_player_1_tile_"+to_string(x)+"_"+to_string(y));
       }
     }
 
@@ -445,6 +351,7 @@ void ui_worker(){
       if(i < 6){
         l_height = l_height.getValue()+border_weight;
       }
+      cout << "preview box " << i << " height " << l_height.getValue() << endl;
       hold_box->setPosition(border_weight, l_height);
 
       for(size_t l_x = 0; l_x < game_field_main_box_tiles; l_x++){
@@ -543,7 +450,7 @@ void ui_worker(){
           game_field_secondary_tile->getRenderer()->setBackgroundColor(color_white);
           game_field_secondary_tile->setSize(game_secondary_tile_size, game_secondary_tile_size);
           game_field_secondary_tile->setPosition(border_weight+(border_weight+game_secondary_tile_size)*x, border_weight+(border_weight+game_secondary_tile_size)*y);
-          game_field_player_secondary->add(game_field_secondary_tile);
+          game_field_player_secondary->add(game_field_secondary_tile, "game_field_player_"+to_string(player_id)+"_tile_"+to_string(x)+"_"+to_string(y));
         }
       }
 
@@ -588,10 +495,232 @@ void ui_worker(){
 
     menubar->moveToFront();
 
+    {
+      auto msgbox = tgui::MessageBox::create();
+      gui.add(msgbox, "menu_connect");
+      msgbox->setVisible(false);
+      msgbox->setTitle("Connect");
+      msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
+      msgbox->setSize({300, 220});
+      msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
+      msgbox->connect("Closed", [=](){
+        msgbox->setVisible(false);
+      });
+
+      auto content = tgui::Panel::create();
+      msgbox->add(content);
+      content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+      content->getRenderer()->setBackgroundColor(color_white);
+
+      auto label_header = tgui::Label::create();
+      content->add(label_header);
+      label_header->setPosition(8, 8);
+      label_header->setTextSize(18);
+      label_header->setText("Connect to Server");
+
+      auto label_server = tgui::Label::create();
+      content->add(label_server);
+      label_server->setPosition(8, bindBottom(label_header));
+      label_server->setTextSize(14);
+      label_server->setText("Server");
+
+      auto edit_server = tgui::EditBox::create();
+      content->add(edit_server);
+      edit_server->setPosition(8, bindBottom(label_server));
+      edit_server->setTextSize(14);
+      edit_server->setSize(bindWidth(content)-8*2, bindHeight(label_server));
+      edit_server->setDefaultText("localhost");
+
+      auto label_port = tgui::Label::create();
+      content->add(label_port);
+      label_port->setPosition(8, bindBottom(edit_server)+8);
+      label_port->setTextSize(14);
+      label_port->setText("Port");
+
+      auto edit_port = tgui::EditBox::create();
+      content->add(edit_port);
+      edit_port->setPosition(8, bindBottom(label_port));
+      edit_port->setTextSize(14);
+      edit_port->setSize(bindWidth(content)-8*2, bindHeight(label_port));
+      edit_port->setDefaultText("28420");
+
+      auto label_username = tgui::Label::create();
+      content->add(label_username);
+      label_username->setPosition(8, bindBottom(edit_port)+8);
+      label_username->setTextSize(14);
+      label_username->setText("Username");
+
+      auto edit_username = tgui::EditBox::create();
+      content->add(edit_username, "menu_connect_username");
+      edit_username->setPosition(8, bindBottom(label_username));
+      edit_username->setTextSize(14);
+      edit_username->setSize(bindWidth(content)-8*2, bindHeight(label_username));
+      edit_username->setDefaultText("TestUser#123");
+
+      auto button_connect = tgui::Button::create();
+      content->add(button_connect);
+      button_connect->setPosition(8, bindBottom(edit_username)+8*2);
+      button_connect->setTextSize(14);
+      button_connect->setSize(bindWidth(content)-8*2, bindHeight(label_header));
+      button_connect->setText("Connect");
+      button_connect->connect("pressed", [=](){
+        msgbox->setVisible(false);
+
+        server = edit_server->getText();
+        if(server.length() == 0) server = edit_server->getDefaultText();
+        edit_server->setDefaultText(server);
+
+        port = edit_port->getText();
+        if(port.length() == 0) port = edit_port->getDefaultText();
+        edit_port->setDefaultText(port);
+
+        username = edit_username->getText();
+        if(username.length() == 0) username = edit_username->getDefaultText();
+        edit_username->setDefaultText(username);
+        static_pointer_cast<tgui::EditBox>(gui.get("menu_reauthenticate_username"))->setText(username);
+
+        util::thread_start_net();
+      });
+    }
+    {
+      auto msgbox = tgui::MessageBox::create();
+      gui.add(msgbox, "menu_channel_list");
+      msgbox->setVisible(false);
+      msgbox->setTitle("Channel list");
+      msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
+      msgbox->setSize({200, 220});
+      msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
+      msgbox->connect("Closed", [=](){
+        msgbox->setVisible(false);
+      });
+
+      auto content = tgui::Panel::create();
+      msgbox->add(content);
+      content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+      content->getRenderer()->setBackgroundColor(color_white);
+
+      auto channel_list = tgui::ListBox::create();
+      channel_list->setSize(bindWidth(content)-16, bindHeight(content)-16);
+      channel_list->setPosition(8, 8);
+      channel_list->connect("DoubleClicked", [=](string elem){
+        string channel_name = "";
+        getline(stringstream(elem), channel_name, ' ');
+        util::join_channel(channel_name);
+      });
+      content->add(channel_list, "channel_list");
+    }
+    {
+      auto msgbox = tgui::MessageBox::create();
+      gui.add(msgbox, "menu_join_channel");
+      msgbox->setVisible(false);
+      msgbox->setTitle("Join Channel");
+      msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
+      msgbox->setSize({200, 90});
+      msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
+      msgbox->connect("Closed", [=](){
+        msgbox->setVisible(false);
+      });
+
+      auto content = tgui::Panel::create();
+      msgbox->add(content);
+      content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+      content->getRenderer()->setBackgroundColor(color_white);
+
+      auto label_channame = tgui::Label::create();
+      label_channame->setPosition(8, 8);
+      label_channame->setTextSize(14);
+      label_channame->setText("Channel Name");
+      content->add(label_channame);
+
+      auto edit_channel = tgui::EditBox::create();
+      edit_channel->setPosition(bindLeft(label_channame), bindBottom(label_channame));
+      edit_channel->setTextSize(14);
+      edit_channel->setSize(bindWidth(content)-8*2, bindHeight(label_channame));
+      edit_channel->setDefaultText("#lobby");
+      content->add(edit_channel);
+
+      auto button_join = tgui::Button::create();
+      content->add(button_join);
+      button_join->setPosition(8, bindBottom(edit_channel)+8*2);
+      button_join->setTextSize(14);
+      button_join->setSize(bindWidth(content)-8*2, bindHeight(edit_channel));
+      button_join->setText("Join");
+      button_join->connect("pressed", [=](){
+        msgbox->setVisible(false);
+        auto channel_name = edit_channel->getText();
+        if(channel_name.getSize() == 0) channel_name = edit_channel->getDefaultText();
+        edit_channel->setDefaultText(channel_name);
+
+        util::join_channel(channel_name);
+      });
+    }
+    {
+      auto msgbox = tgui::MessageBox::create();
+      gui.add(msgbox, "menu_reauthenticate");
+      msgbox->setVisible(false);
+      msgbox->setTitle("Reauthenticate");
+      msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
+      msgbox->setSize({200, 90});
+      msgbox->setPosition(bindWidth(gui)/2-200/2, bindHeight(gui)/2-90/2);
+      msgbox->connect("Closed", [=](){
+        msgbox->setVisible(false);
+      });
+
+      auto content = tgui::Panel::create();
+      msgbox->add(content);
+      content->setSize(bindWidth(msgbox), bindHeight(msgbox));
+      content->getRenderer()->setBackgroundColor(color_white);
+
+      auto label_username = tgui::Label::create();
+      label_username->setPosition(8, 8);
+      label_username->setTextSize(14);
+      label_username->setText("Username");
+      content->add(label_username);
+
+      auto edit_username = tgui::EditBox::create();
+      edit_username->setPosition(bindLeft(label_username), bindBottom(label_username));
+      edit_username->setTextSize(14);
+      edit_username->setSize(bindWidth(content)-8*2, bindHeight(label_username));
+      edit_username->setDefaultText("Enter username...");
+      content->add(edit_username, "menu_reauthenticate_username");
+
+      auto button_join = tgui::Button::create();
+      content->add(button_join);
+      button_join->setPosition(8, bindBottom(edit_username)+8*2);
+      button_join->setTextSize(14);
+      button_join->setSize(bindWidth(content)-8*2, bindHeight(edit_username));
+      button_join->setText("Authenticate");
+      button_join->connect("pressed", [=](){
+        auto new_username = edit_username->getText();
+        if(new_username.getSize() > 0){
+          msgbox->setVisible(false);
+          static_pointer_cast<tgui::EditBox>(gui.get("menu_connect_username"))->setText(new_username);
+          edit_username->setText(new_username);
+          util::authenticate_as(new_username);
+        }else{
+          util::add_error_message("No username given");
+        }
+      });
+    }
+    {
+      auto msgbox = tgui::MessageBox::create();
+      gui.add(msgbox, "menu_about");
+      msgbox->setVisible(false);
+      msgbox->setTitle("About");
+      msgbox->setTitleButtons(tgui::ChildWindow::TitleButton::Close);
+      msgbox->setPosition(bindWidth(gui)/2-300/2, bindHeight(gui)/2-220/2);
+      msgbox->setText("cetrinet by coderobe\n2018-2020\nhttps://coderobe.net");
+      msgbox->connect("Closed", [=](){
+        msgbox->setVisible(false);
+      });
+
+    }
+
   }catch(const tgui::Exception& e){
     cerr << "TGUI Exception: " << e.what() << endl;
   }
 
+  ui_update_channels();
   onMenuSelected(gui, "Connect");
 
 
@@ -623,4 +752,5 @@ void ui_worker(){
       sf::sleep(TimePerFrame);
     }
   }
+  net_disconnect();
 }

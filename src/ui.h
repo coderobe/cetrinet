@@ -25,6 +25,7 @@ void ui_worker();
 void ui_update_chats();
 void ui_update_channels();
 void ui_update_users();
+void ui_show_reauth();
 bool ui_running();
 
 #endif
