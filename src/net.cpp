@@ -17,7 +17,7 @@ void net_send(vector<unsigned char> data){
 }
 
 void net_disconnect(){
-  lock_guard<mutex> lock(net_disconnect_mutex);
+  scoped_lock lock(net_disconnect_mutex);
   if(net_client != nullptr){
     net_connection = nullptr;
     net_client->stop();
