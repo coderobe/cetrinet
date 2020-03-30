@@ -73,6 +73,14 @@ namespace util {
     ui_update_chats();
   }
 
+  void authenticate_as(string new_username){
+    proto::auth auth = proto::auth();
+    auth.name = new_username;
+    username = new_username.substr(0, new_username.find_last_of("#"));
+    util::add_muted_message("Authenticating as '"+username+"'"+(username != new_username ? " with tripcode" : "")+"...");
+    net_send(auth.encode());
+  }
+
   void send_message(string to, string content){
     shared_ptr<proto::cmsg> msg = make_shared<proto::cmsg>();
     msg->target = to;
