@@ -8,6 +8,7 @@ namespace proto {
   class base {
   public:
     base();
+    virtual ~base();
     size_t version;
     std::string type;
 

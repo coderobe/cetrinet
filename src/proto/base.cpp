@@ -6,6 +6,8 @@ namespace proto {
   base::base(){
     populate();
   }
+  base::~base(){
+  }
   void base::populate(){
     version = 1;
     type = "";
