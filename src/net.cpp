@@ -3,6 +3,7 @@
 using namespace std;
 using json = nlohmann::json;
 
+std::atomic<bool> net_connected = true;
 shared_ptr<WsClient::Connection> net_connection;
 mutex net_disconnect_mutex;
 
@@ -25,15 +26,9 @@ void net_disconnect(){
 }
 
 void net_worker(){
-  if(server.size() < 1){
-    server = "localhost";
-  }
-  if(port.size() < 1){
-    port = "28420";
-  }
-  if(username.size() < 1){
-    username = "TestUser#123"; //TODO: change me
-  }
+  if(net_connected) net_disconnect();
+  net_connected = true;
+
   if(username.substr(0, username.find("#")).length() < 1){
     util::add_error_message("Bad username");
     return;
@@ -93,5 +88,6 @@ void net_worker(){
   };
 
   net_client->start();
+  net_connected = false;
   util::add_info_message("Disconnected from server");
 }
