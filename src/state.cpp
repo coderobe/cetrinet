@@ -145,14 +145,12 @@ void state_update(json payload){
 
   EVENT_AS(proto::channelupdate, {
     for(shared_ptr<proto::channel> chan : channels){
-      cout << "iterating over " << chan->name << " looking for " << event->target << endl;
       if(chan->name == event->target){
         chan->users = event->users;
-        cout << "channel " << event->target << " updated with " << event->users << " users" << endl;
         if(chan->users == 0){
           channels.erase(std::remove(channels.begin(), channels.end(), chan), channels.end());
-          cout << "channel " << event->target << " erased" << endl;
         }
+        ui_update_channels();
         return;
       }
     }
@@ -180,6 +178,7 @@ void state_update(json payload){
           new_users.push_back(nu);
         }
         chan->userdata.swap(new_users);
+        ui_update_users();
         return;
       }
     }
