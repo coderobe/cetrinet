@@ -77,26 +77,26 @@ namespace util {
     shared_ptr<proto::cmsg> msg = make_shared<proto::cmsg>();
     msg->target = to;
     msg->message = content;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void join_channel(string channel){
     shared_ptr<proto::join> msg = make_shared<proto::join>();
     msg->target = channel;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void leave_channel(string channel){
     shared_ptr<proto::part> msg = make_shared<proto::part>();
     msg->target = channel;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void set_ready(string channel, bool ready){
     shared_ptr<proto::greadystate> msg = make_shared<proto::greadystate>();
     msg->target = channel;
     msg->ready = ready;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void toggle_ready(string channel){
@@ -115,13 +115,13 @@ namespace util {
   void send_gstart(string channel){
     shared_ptr<proto::gstart> msg = make_shared<proto::gstart>();
     msg->target = channel;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void send_gstop(string channel){
     shared_ptr<proto::gstop> msg = make_shared<proto::gstop>();
     msg->target = channel;
-    net_send(json::to_msgpack(msg->encode()));
+    net_send(msg->encode());
   }
 
   void thread_start_net(){
