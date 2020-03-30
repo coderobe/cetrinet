@@ -13,6 +13,7 @@
 #include "proto/error.h"
 #include "proto/join.h"
 #include "proto/channellist.h"
+#include "proto/channelupdate.h"
 #include "proto/userlist.h"
 #include "proto/gtick.h"
 #include "proto/greadystate.h"
@@ -20,5 +21,6 @@
 #include "proto/gstop.h"
 
 void state_update(nlohmann::json event_payload);
+void state_init();
 
 #endif

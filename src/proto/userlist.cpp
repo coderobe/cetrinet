@@ -14,7 +14,7 @@ namespace proto {
   void userlist::load_json(json payload){
     super::load_json(payload);
 
-    channel = payload["d"].value("c", "<error>");
+    target = payload["d"].value("t", "<error>");
 
     json users_json = payload["d"].value("u", json::array());
     for(auto user_json : users_json){
@@ -28,7 +28,7 @@ namespace proto {
   json userlist::encode(){
     json payload = super::encode();
 
-    payload["d"]["c"] = channel;
+    payload["d"]["t"] = target;
 
     payload["d"]["u"] = json::array();
     for(std::shared_ptr<user> u : users){

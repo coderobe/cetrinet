@@ -13,7 +13,7 @@ namespace proto {
     typedef base super;
   public:
     userlist();
-    std::string channel;
+    std::string target;
     std::vector<std::shared_ptr<user>> users;
 
     void populate();

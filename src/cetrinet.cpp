@@ -5,6 +5,7 @@
 
 #include "ui.h"
 #include "util.h"
+#include "state.h"
 #include "proto/channel.h"
 #include "proto/message.h"
 
@@ -60,6 +61,7 @@ int main(){
 
   cout << "Hello, cetrinet!" << endl;
 
+  state_init();
   util::thread_start_ui();
 
   while(!threads.empty()){
