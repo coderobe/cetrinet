@@ -38,43 +38,48 @@ void ui_gui_set_font(T gui, string font){
 }
 
 string ui_channel_current = "Server";
-mutex ui_update_chats_mutex;
+mutex ui_update_chats_lock;
+mutex ui_update_channels_lock;
 
 void ui_update_chats(){
-  lock_guard<mutex> lock(ui_update_chats_mutex);
+  scoped_lock lock(ui_update_chats_lock);
   tgui::ChatBox::Ptr chat_server = static_pointer_cast<tgui::ChatBox>(gui.get("panel_server_chat"));
   tgui::ChatBox::Ptr chat_channel = static_pointer_cast<tgui::ChatBox>(gui.get("panel_channel_chat"));
 
   chat_server->removeAllLines();
   chat_channel->removeAllLines();
-  for(auto msg : server_messages){
-    if(msg->to == "raw"){ // raw text, no further processing
-      chat_server->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-      chat_channel->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-      continue;
+  {
+    scoped_lock lock(server_messages_lock);
+    for(shared_ptr<proto::message> msg : server_messages){
+      if(msg->to == "raw"){ // raw text, no further processing
+        chat_server->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+        chat_channel->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+        continue;
+      }
+
+      string time = ctime(&(msg->time));
+      time.pop_back(); // remove trailing newline
+      string timepadding(time.length(), ' '); // padding for multiline strings
+      string frompadding(msg->from.length(), ' ');
+
+      bool first_line = true;
+      istringstream lines(msg->content);
+      for(string line; getline(lines, line, '\n'); [msg, chat_server, chat_channel](string line, bool& first_line, string time, string timepadding, string frompadding){
+        if(msg->to == "server"){
+          chat_server->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+        }
+        if(msg->to == ui_channel_current || msg->to == "server"){
+          chat_channel->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
+        }
+        first_line = false;
+      }(line, first_line, time, timepadding, frompadding));
     }
-
-    string time = ctime(&(msg->time));
-    time.pop_back(); // remove trailing newline
-    string timepadding(time.length(), ' '); // padding for multiline strings
-    string frompadding(msg->from.length(), ' ');
-
-    bool first_line = true;
-    istringstream lines(msg->content);
-    for(string line; getline(lines, line, '\n'); [msg, chat_server, chat_channel](string line, bool& first_line, string time, string timepadding, string frompadding){
-      if(msg->to == "server"){
-        chat_server->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-      }
-      if(msg->to == ui_channel_current || msg->to == "server"){
-        chat_channel->addLine((first_line ? time : timepadding)+" | "+(first_line ? msg->from : frompadding)+line, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
-      }
-      first_line = false;
-    }(line, first_line, time, timepadding, frompadding));
   }
   ui_needs_redraw = true;
 }
 
 void ui_update_channels(){
+  scoped_lock lock(ui_update_channels_lock, channels_lock);
   tgui::Tabs::Ptr tabs = static_pointer_cast<tgui::Tabs>(gui.get("tab_channels"));
 
   tabs->removeAll();
@@ -607,7 +612,7 @@ void ui_worker(){
       gui.handleEvent(event);
     }
     if(ui_needs_redraw){
-      lock_guard<mutex> lock(ui_update_chats_mutex);
+      scoped_lock lock(ui_update_chats_lock, ui_update_channels_lock);
       ui_has_drawn = true;
       window.clear(color_white);
       gui.draw();

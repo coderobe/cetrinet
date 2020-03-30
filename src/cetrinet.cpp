@@ -16,7 +16,9 @@ std::vector<std::shared_ptr<std::thread>> threads;
 std::string server;
 std::string port;
 std::string username;
+std::mutex channels_lock;
 std::vector<std::shared_ptr<proto::channel>> channels;
+std::mutex server_messages_lock;
 std::vector<std::shared_ptr<proto::message>> server_messages;
 sf::RenderWindow window(sf::VideoMode(948, 720), "cetrinet");
 tgui::Gui gui(window);
@@ -28,20 +30,27 @@ sf::Color color_green = sf::Color(0, 255, 0, 255);
 sf::Color color_blue = sf::Color(0, 0, 255, 255);
 
 void clean_up(){
-  while(!channels.empty()){
-    channels.erase(channels.begin());
+
+  {
+    scoped_lock lock(channels_lock);
+    while(!channels.empty()){
+      channels.erase(channels.begin());
+    }
   }
 
-  server_messages.erase(
-    std::remove_if(
-      server_messages.begin(),
-      server_messages.end(),
-      [](const shared_ptr<proto::message> msg) {
-        return (msg->to != "server") && (msg->to != "raw");
-      }
-    ),
-    server_messages.end()
-  );
+  {
+    scoped_lock lock(server_messages_lock);
+    server_messages.erase(
+      std::remove_if(
+        server_messages.begin(),
+        server_messages.end(),
+        [](const shared_ptr<proto::message> msg) {
+          return (msg->to != "server") && (msg->to != "raw");
+        }
+      ),
+      server_messages.end()
+    );
+  }
 }
 
 int main(){
