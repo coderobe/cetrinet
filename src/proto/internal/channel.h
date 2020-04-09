@@ -1,12 +1,12 @@
-#ifndef _PROTO_CHANNEL_H
-#define _PROTO_CHANNEL_H
+#ifndef _PROTO_INTERNAL_CHANNEL_H
+#define _PROTO_INTERNAL_CHANNEL_H
 
 #include <string>
 
 #include "user.h"
 #include "message.h"
 
-namespace proto {
+namespace proto::internal {
   typedef struct {
     std::string name;
     size_t users;

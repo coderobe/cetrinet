@@ -4,8 +4,8 @@
 #include <vector>
 #include <thread>
 
-#include "proto/channel.h"
-#include "proto/message.h"
+#include "proto/internal/channel.h"
+#include "proto/internal/message.h"
 
 #include <TGUI/TGUI.hpp>
 #include <simple-websocket-server/client_ws.hpp>
@@ -18,9 +18,9 @@ extern std::string server;
 extern std::string port;
 extern std::string username;
 extern std::mutex channels_lock;
-extern std::vector<std::shared_ptr<proto::channel>> channels;
+extern std::vector<std::shared_ptr<proto::internal::channel>> channels;
 extern std::mutex server_messages_lock;
-extern std::vector<std::shared_ptr<proto::message>> server_messages;
+extern std::vector<std::shared_ptr<proto::internal::message>> server_messages;
 extern sf::RenderWindow window;
 extern tgui::Gui gui;
 extern sf::Color color_white;

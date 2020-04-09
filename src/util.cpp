@@ -33,7 +33,7 @@ namespace util {
   }
 
   void add_message_divider(){
-    shared_ptr<proto::message> lmsg = make_shared<proto::message>();
+    shared_ptr<proto::internal::message> lmsg = make_shared<proto::internal::message>();
     lmsg->to = "raw";
     lmsg->content = "---";
     lmsg->rgb[0] = 0;
@@ -50,7 +50,7 @@ namespace util {
 
   void add_message(string to, string from, string content, unsigned char color[3]){
     from = (from.length() == 0 ? "" : from+": ");
-    shared_ptr<proto::message> lmsg = make_shared<proto::message>();
+    shared_ptr<proto::internal::message> lmsg = make_shared<proto::internal::message>();
     lmsg->to = to;
     lmsg->from = from;
     lmsg->content = content;

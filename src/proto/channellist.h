@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "base.h"
-#include "channel.h"
+#include "internal/channel.h"
 
 namespace proto {
   class channellist : public base {
@@ -13,7 +13,7 @@ namespace proto {
     typedef base super;
   public:
     channellist();
-    std::vector<std::shared_ptr<channel>> channels;
+    std::vector<std::shared_ptr<internal::channel>> channels;
 
     void populate();
     void load_json(nlohmann::json payload);

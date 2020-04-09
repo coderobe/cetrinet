@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "base.h"
-#include "user.h"
+#include "internal/user.h"
 
 namespace proto {
   class userlist : public base {
@@ -14,7 +14,7 @@ namespace proto {
   public:
     userlist();
     std::string target;
-    std::vector<std::shared_ptr<user>> users;
+    std::vector<std::shared_ptr<internal::user>> users;
 
     void populate();
     void load_json(nlohmann::json payload);

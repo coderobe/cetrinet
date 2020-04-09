@@ -11,7 +11,7 @@
 
 #include "globals.h"
 #include "net.h"
-#include "proto/message.h"
+#include "proto/internal/message.h"
 
 namespace util{
   void thread_start_net();

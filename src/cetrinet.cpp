@@ -6,8 +6,8 @@
 #include "ui.h"
 #include "util.h"
 #include "state.h"
-#include "proto/channel.h"
-#include "proto/message.h"
+#include "proto/internal/channel.h"
+#include "proto/internal/message.h"
 
 using namespace std;
 
@@ -18,9 +18,9 @@ std::string server;
 std::string port;
 std::string username;
 std::mutex channels_lock;
-std::vector<std::shared_ptr<proto::channel>> channels;
+std::vector<std::shared_ptr<proto::internal::channel>> channels;
 std::mutex server_messages_lock;
-std::vector<std::shared_ptr<proto::message>> server_messages;
+std::vector<std::shared_ptr<proto::internal::message>> server_messages;
 sf::RenderWindow window(sf::VideoMode(948, 720), "cetrinet");
 tgui::Gui gui(window);
 sf::Color color_white = sf::Color::White;
@@ -45,7 +45,7 @@ void clean_up(){
       std::remove_if(
         server_messages.begin(),
         server_messages.end(),
-        [](const shared_ptr<proto::message> msg) {
+        [](const shared_ptr<proto::internal::message> msg) {
           return (msg->to != "server") && (msg->to != "raw");
         }
       ),

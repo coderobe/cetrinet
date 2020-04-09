@@ -50,7 +50,7 @@ void ui_update_chats(){
   chat_channel->removeAllLines();
   {
     scoped_lock lock(server_messages_lock);
-    for(shared_ptr<proto::message> msg : server_messages){
+    for(shared_ptr<proto::internal::message> msg : server_messages){
       if(msg->to == "raw"){ // raw text, no further processing
         chat_server->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});
         chat_channel->addLine(msg->content, {msg->rgb[0], msg->rgb[1], msg->rgb[2]});

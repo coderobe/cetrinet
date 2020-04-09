@@ -1,10 +1,10 @@
-#ifndef _PROTO_MESSAGE_H
-#define _PROTO_MESSAGE_H
+#ifndef _PROTO_INTERNAL_MESSAGE_H
+#define _PROTO_INTERNAL_MESSAGE_H
 
 #include <string>
 #include <ctime>
 
-namespace proto {
+namespace proto::internal {
   typedef struct {
     std::string to;
     std::string from;

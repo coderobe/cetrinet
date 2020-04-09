@@ -63,13 +63,13 @@ void state_update(json payload){
 
   EVENT_AS(proto::join, {
     bool found = false;
-    for(shared_ptr<proto::channel> chan : channels){
+    for(shared_ptr<proto::internal::channel> chan : channels){
       if(chan->name == event->target){
         found = true;
         if(event->user == username){
           chan->joined = true;
         }else{
-          shared_ptr<proto::user> nu = make_shared<proto::user>();
+          shared_ptr<proto::internal::user> nu = make_shared<proto::internal::user>();
           nu->name = event->user;
           chan->userdata.push_back(nu);
         }
@@ -79,11 +79,11 @@ void state_update(json payload){
     if(!found){
       //util::add_muted_message("Server sent a join event for an unknown channel ("+event->target+")");
 
-      vector<shared_ptr<proto::user>> new_users;
-      shared_ptr<proto::user> nu = make_shared<proto::user>();
+      vector<shared_ptr<proto::internal::user>> new_users;
+      shared_ptr<proto::internal::user> nu = make_shared<proto::internal::user>();
       nu->name = event->user;
       new_users.push_back(nu);
-      shared_ptr<proto::channel> channel = make_shared<proto::channel>();
+      shared_ptr<proto::internal::channel> channel = make_shared<proto::internal::channel>();
       channel->name = event->target;
       channel->userdata = new_users;
       channel->joined = event->user == username;
@@ -98,7 +98,7 @@ void state_update(json payload){
 
 
   EVENT_AS(proto::part, {
-    for(shared_ptr<proto::channel> chan : channels){
+    for(shared_ptr<proto::internal::channel> chan : channels){
       if(chan->name == event->target){
         if(event->user == username){
           chan->joined = false;
@@ -131,8 +131,8 @@ void state_update(json payload){
   });
 
   EVENT_AS(proto::channellist, {
-    for(shared_ptr<proto::channel> chan : event->channels){
-      shared_ptr<proto::channel> channel = make_shared<proto::channel>();
+    for(shared_ptr<proto::internal::channel> chan : event->channels){
+      shared_ptr<proto::internal::channel> channel = make_shared<proto::internal::channel>();
       channel->name = chan->name;
       channel->users = chan->users;
       channel->joined = chan->joined;
@@ -144,7 +144,7 @@ void state_update(json payload){
   });
 
   EVENT_AS(proto::channelupdate, {
-    for(shared_ptr<proto::channel> chan : channels){
+    for(shared_ptr<proto::internal::channel> chan : channels){
       if(chan->name == event->target){
         chan->users = event->users;
         if(chan->users == 0){
@@ -155,8 +155,8 @@ void state_update(json payload){
       }
     }
 
-    vector<shared_ptr<proto::user>> new_users;
-    shared_ptr<proto::channel> channel = make_shared<proto::channel>();
+    vector<shared_ptr<proto::internal::user>> new_users;
+    shared_ptr<proto::internal::channel> channel = make_shared<proto::internal::channel>();
     channel->name = event->target;
     channel->userdata = new_users;
     channel->users = event->users;
@@ -168,11 +168,11 @@ void state_update(json payload){
   });
 
   EVENT_AS(proto::userlist, {
-    for(shared_ptr<proto::channel> chan : channels){
+    for(shared_ptr<proto::internal::channel> chan : channels){
       if(chan->name == event->target){
-        vector<shared_ptr<proto::user>> new_users;
-        for(shared_ptr<proto::user> eu : event->users){
-          shared_ptr<proto::user> nu = make_shared<proto::user>();
+        vector<shared_ptr<proto::internal::user>> new_users;
+        for(shared_ptr<proto::internal::user> eu : event->users){
+          shared_ptr<proto::internal::user> nu = make_shared<proto::internal::user>();
           nu->name = eu->name;
           nu->ready = false;
           new_users.push_back(nu);
@@ -183,15 +183,15 @@ void state_update(json payload){
       }
     }
 
-    vector<shared_ptr<proto::user>> new_users;
-    for(shared_ptr<proto::user> eu : event->users){
-      shared_ptr<proto::user> nu = make_shared<proto::user>();
+    vector<shared_ptr<proto::internal::user>> new_users;
+    for(shared_ptr<proto::internal::user> eu : event->users){
+      shared_ptr<proto::internal::user> nu = make_shared<proto::internal::user>();
       nu->name = eu->name;
       nu->ready = false;
       new_users.push_back(nu);
     }
 
-    shared_ptr<proto::channel> channel = make_shared<proto::channel>();
+    shared_ptr<proto::internal::channel> channel = make_shared<proto::internal::channel>();
     channel->name = event->target;
     channel->userdata = new_users;
     channel->joined = false;
@@ -211,9 +211,9 @@ void state_update(json payload){
   });
 
   EVENT_AS(proto::greadystate, {
-    util::add_notify_message_for(event->target, event->source+" is "+(event->ready ? "" : "not")+" ready");
+    util::add_notify_message_for(event->target, event->source+" is "+(event->ready ? "" : "not ")+"ready");
 
-    for(shared_ptr<proto::channel> chan : channels){
+    for(shared_ptr<proto::internal::channel> chan : channels){
       if(chan->name == event->target){
         for(auto user : chan->userdata){
           if(user->name == event->source){
